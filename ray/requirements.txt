@@ -1,0 +1,4 @@
+ray[default, data, tune, serve]==2.40.0
+
+tensorflow>=2.0
+requests

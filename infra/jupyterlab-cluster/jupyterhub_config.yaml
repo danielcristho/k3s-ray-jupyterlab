@@ -1,0 +1,56 @@
+hub:
+  config:
+    JupyterHub:
+      authenticator_class: dummy
+      shutdownOnLogout: True
+    KubeSpawner:
+      k8s_api_request_timeout: 12345
+      start_timeout: 300
+      http_timeout: 300
+      pod_pending_timeout: 600
+      image_pull_timeout: 300
+    Authenticator:
+      admin_users:
+        - admin
+  db:
+    url: sqlite:////data/jupyterhub.sqlite
+  service:
+    type: ClusterIP
+  extraVolumes:
+    - name: jupyterhub-db
+      persistentVolumeClaim:
+        claimName: jupyterhub-pvc
+  extraVolumeMounts:
+    - name: jupyterhub-db
+      mountPath: /data
+
+proxy:
+  secretToken: "c413fe27d65c5916b7cf4028bf49a19b3056d59f2c2d1e79349244a6f758babe"
+  https:
+    enabled: false
+  service:
+    type: ClusterIP
+
+singleuser:
+  image:
+    name: "jupyter/minimal-notebook"
+    tag: "python-3.10"
+  defaultUrl: "/lab"
+  extraEnv:
+    JUPYTERHUB_API_URL: http://hub.jhub:8081/hub/api
+  storage:
+    capacity: 1G
+    dynamic:
+      pvcNameTemplate: claim-{username}
+      storageAccessModes: ["ReadWriteOnce"]
+  memory:
+    guarantee: 512M
+    limit: 1G
+  cpu:
+    guarantee: 0.5
+    limit: 1
+
+cull:
+  enabled: true
+  timeout: 600
+  every: 60

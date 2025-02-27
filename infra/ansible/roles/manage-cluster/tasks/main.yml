@@ -1,0 +1,23 @@
+---
+- name: Install kubernetes library for Python
+  ansible.builtin.pip:
+    name: kubernetes
+
+- name: Clone ray project
+  changed_when: false
+  ansible.builtin.git:
+    repo: https://github.com/danielcristho/ray-jupyterlab-k3s.git
+    dest: /home/ubuntu/ray-jupyterlab-k3s
+    clone: true
+
+- name: Config Git global safe directory
+  ansible.builtin.command: git config --global --add safe.directory /home/ubuntu/ray-jupyterlab-k3
+  args:
+    creates: /home/ubuntu/.gitconfig
+  become: true
+
+- name: Install calico network plugin
+  kubernetes.core.k8s:
+    kubeconfig: /home/ubuntu/.kube/config
+    src: /home/ubuntu/ray-jupyterlab-k3s/infra/ray-cluster/manifests/calico.yaml
+    state: present
