@@ -1,6 +1,6 @@
 .PHONY: raycluster
 
-kuberay_version = 1.3.0
+kuberay_version = 1.2.2
 
 # ## Create private registry
 # registry:
