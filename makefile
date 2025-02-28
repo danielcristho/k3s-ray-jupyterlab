@@ -21,6 +21,11 @@ kuberay_version = 1.2.2
 # 	docker build -t localhost:5100/jupyterhub:latest -f infra/docker/jupyterhub.Dockerfile .
 # 	docker push localhost:5100/jupyterhub:latest
 
+# Build and push jupyter image to dockerhub
+publish-jupyterlab:
+	docker build -t danielcristh0/datascience-notebook:python-3.10.11 -f infra/docker/jupyterlab.Dockerfile .
+	docker push danielcristh0/datascience-notebook:python-3.10.11
+
 ## install kuberay operator using quickstart manifests
 kuberay:
 # add helm repo and update to latest
@@ -44,7 +49,7 @@ service = raycluster-$(cluster)-head-svc
 
 ## install network plugin
 network-plugin:
-	kubectl apply -f /home/ubuntu/ray-jupyterlab-k3s/infra/ray-cluster/manifests/calico.yaml
+	kubectl apply -f /home/ubuntu/k3s-ray-jupyterlab/infra/ray-cluster/manifests/calico.yaml
 
 ## enable 'local-path'
 local-path:
@@ -116,7 +121,7 @@ jupyterhub-install:
 
 ## Add pvc
 jupyterhub-pvc:
-	kubectl apply -f /home/ubuntu/ray-jupyterlab-k3s/infra/jupyterlab-cluster/jupyterhub_pvc.yaml
+	kubectl apply -f /home/ubuntu/k3s-ray-jupyterlab/infra/jupyterlab-cluster/jupyterhub_pvc.yaml
 
 ## Create JupyterHub cluster
 jupyterhub-cluster:
@@ -124,7 +129,7 @@ jupyterhub-cluster:
 		--install jhub jupyterhub/jupyterhub \
 		--namespace jhub \
 		--version=4.0.0 \
-		--values /home/ubuntu/ray-jupyterlab-k3s/infra/jupyterlab-cluster/jupyterhub_config.yaml
+		--values /home/ubuntu/k3s-ray-jupyterlab/infra/jupyterlab-cluster/jupyterhub_config.yaml
 
 ## expose jupyterhub
 Jupyterhub-forward:

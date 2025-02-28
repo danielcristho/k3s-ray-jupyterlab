@@ -16,6 +16,10 @@ hub:
     url: sqlite:////data/jupyterhub.sqlite
   service:
     type: ClusterIP
+  extraConfig:
+    00-connect-ray: |
+      import os
+      os.environ["RAY_ADDRESS"] = "ray://192.168.122.10:10001"
   extraVolumes:
     - name: jupyterhub-db
       persistentVolumeClaim:
@@ -33,11 +37,13 @@ proxy:
 
 singleuser:
   image:
-    name: "jupyter/minimal-notebook"
-    tag: "python-3.10"
+    name: "danielcristh0/datascience-notebook"
+    tag: "python-3.10.11"
   defaultUrl: "/lab"
   extraEnv:
+    # USER: "root"
     JUPYTERHUB_API_URL: http://hub.jhub:8081/hub/api
+    RAY_ADDRESS: "ray://192.168.122.10:10001"
   storage:
     capacity: 1G
     dynamic:
