@@ -1,9 +1,12 @@
 resource "null_resource" "cache_image" {
+  triggers = {
+    always_run = timestamp()
+  }
+
   provisioner "local-exec" {
     command = "wget -O /tmp/ubuntu-22.04.qcow2 ${var.ubuntu_22_img_url}"
   }
 }
-
 resource "libvirt_volume" "base" {
   name       = "base.qcow2"
   source     = "/tmp/ubuntu-22.04.qcow2"

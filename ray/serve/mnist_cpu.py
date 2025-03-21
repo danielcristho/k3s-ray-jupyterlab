@@ -1,62 +1,127 @@
+# Stolen from https://docs.ray.io/en/latest/train/examples/tensorflow_mnist_example.html
+
+# This example showcases how to use Tensorflow with Ray Train.
+# Original code:
+# https://www.tensorflow.org/tutorials/distribute/multi_worker_with_keras
+import argparse
+import json
 import os
-import tempfile
+
 import numpy as np
-import ray
-from ray import serve
-from starlette.requests import Request
-from typing import Dict
 import tensorflow as tf
+from ray.air.integrations.keras import ReportCheckpointCallback as TrainReportCallback
 
-TRAINED_MODEL_PATH = os.path.join(tempfile.gettempdir(), "mnist_model.h5")
+from ray.train.tensorflow import TensorflowTrainer
+from ray.air.config import ScalingConfig
 
-ray.init("ray://192.168.122.10:10001", ignore_reinit_error=True, logging_level="debug", allow_multiple=True)
-serve.start()
+def mnist_dataset(batch_size):
+    (x_train, y_train), _ = tf.keras.datasets.mnist.load_data()
+    # The `x` arrays are in uint8 and have values in the [0, 255] range.
+    # You need to convert them to float32 with values in the [0, 1] range.
+    x_train = x_train / np.float32(255)
+    y_train = y_train.astype(np.int64)
+    train_dataset = (
+        tf.data.Dataset.from_tensor_slices((x_train, y_train))
+        .shuffle(60000)
+        .repeat()
+        .batch(batch_size)
+    )
+    return train_dataset
 
 
-def train_and_save_model():
-    """Train and save a simple MNIST model."""
-    mnist = tf.keras.datasets.mnist
-    (x_train, y_train), (x_test, y_test) = mnist.load_data()
-    x_train, x_test = x_train / 255.0, x_test / 255.0
-
-    model = tf.keras.models.Sequential(
+def build_and_compile_cnn_model(config):
+    learning_rate = config.get("lr", 0.001)
+    model = tf.keras.Sequential(
         [
-            tf.keras.layers.Flatten(input_shape=(28, 28)),
+            tf.keras.Input(shape=(28, 28)),
+            tf.keras.layers.Reshape(target_shape=(28, 28, 1)),
+            tf.keras.layers.Conv2D(32, 3, activation="relu"),
+            tf.keras.layers.Flatten(),
             tf.keras.layers.Dense(128, activation="relu"),
-            tf.keras.layers.Dropout(0.2),
             tf.keras.layers.Dense(10),
         ]
     )
-    model.compile(optimizer="adam", loss="sparse_categorical_crossentropy", metrics=["accuracy"])
-    model.fit(x_train, y_train, epochs=1, verbose=1)
-
-    model.save(TRAINED_MODEL_PATH)
-
-
-if not os.path.exists(TRAINED_MODEL_PATH):
-    train_and_save_model()
+    model.compile(
+        loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+        optimizer=tf.keras.optimizers.SGD(learning_rate=learning_rate),
+        metrics=["accuracy"],
+    )
+    return model
 
 
-@serve.deployment(route_prefix="/predict")
-class TFMnistModel:
-    def __init__(self, model_path: str):
-        """Load TensorFlow model."""
-        self.model = tf.keras.models.load_model(model_path)
+def train_func(config):
+    per_worker_batch_size = config.get("batch_size", 64)
+    epochs = config.get("epochs", 3)
+    steps_per_epoch = config.get("steps_per_epoch", 70)
 
-    async def __call__(self, request: Request) -> Dict:
-        """Menerima input JSON, melakukan prediksi, dan mengembalikan hasil."""
-        data = await request.json()
-        input_array = np.array(data["array"]).reshape((1, 28, 28))
+    tf_config = json.loads(os.environ["TF_CONFIG"])
+    num_workers = len(tf_config["cluster"]["worker"])
 
-        prediction = self.model(input_array)
-        return {"prediction": prediction.numpy().tolist()}
+    strategy = tf.distribute.MultiWorkerMirroredStrategy()
+
+    global_batch_size = per_worker_batch_size * num_workers
+    multi_worker_dataset = mnist_dataset(global_batch_size)
+
+    with strategy.scope():
+        # Model building/compiling need to be within `strategy.scope()`.
+        multi_worker_model = build_and_compile_cnn_model(config)
+
+    history = multi_worker_model.fit(
+        multi_worker_dataset,
+        epochs=epochs,
+        steps_per_epoch=steps_per_epoch,
+        callbacks=[TrainReportCallback()],
+    )
+    results = history.history
+    return results
 
 
-@serve.deployment(route_prefix="/health")
-class HealthCheck:
-    def __call__(self):
-        return {"status": "ok"}
+def train_tensorflow_mnist(num_workers=2, use_gpu=False, epochs=4):
+    trainer = TensorflowTrainer(
+        train_func,
+        train_loop_config={"lr": 1e-3, "batch_size": 64, "epochs": epochs},
+        # in total this will request num_workers+1 CPUs (1 CPU is needed for the Trainer)
+        # using the default PACK placement strategy
+        scaling_config=ScalingConfig(num_workers=num_workers, use_gpu=use_gpu),
+    )
+    results = trainer.fit()
+    print(f"Results: {results.metrics}")
 
 
-serve.run(TFMnistModel.bind(TRAINED_MODEL_PATH))
-serve.run(HealthCheck.bind())
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--address", required=False, type=str, help="the address to use for Ray"
+    )
+    parser.add_argument(
+        "--num-workers",
+        "-n",
+        type=int,
+        default=2,
+        help="Sets number of workers for training.",
+    )
+    parser.add_argument(
+        "--use-gpu", action="store_true", default=False, help="Enables GPU training"
+    )
+    parser.add_argument(
+        "--epochs", type=int, default=3, help="Number of epochs to train for."
+    )
+    parser.add_argument(
+        "--smoke-test",
+        action="store_true",
+        default=False,
+        help="Finish quickly for testing.",
+    )
+
+    args, _ = parser.parse_known_args()
+
+    import ray
+
+    if args.smoke_test:
+        ray.init(num_cpus=2)
+        train_tensorflow_mnist()
+    else:
+        ray.init(address=args.address)
+        train_tensorflow_mnist(
+            num_workers=args.num_workers, use_gpu=args.use_gpu, epochs=args.epochs
+        )
