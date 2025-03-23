@@ -2,13 +2,13 @@ hub:
   config:
     JupyterHub:
       authenticator_class: dummy
-      shutdownOnLogout: True
+      shutdown_on_logout: True
     KubeSpawner:
-      k8s_api_request_timeout: 12345
-      start_timeout: 300
-      http_timeout: 300
-      pod_pending_timeout: 600
-      image_pull_timeout: 300
+      k8s_api_request_timeout: 60
+      start_timeout: 120
+      http_timeout: 60
+      pod_pending_timeout: 180
+      image_pull_timeout: 120
     Authenticator:
       admin_users:
         - admin
