@@ -23,8 +23,8 @@ kuberay_version = 1.2.2
 
 # Build and push jupyter image to dockerhub
 publish-jupyterlab:
-	docker build -t danielcristh0/datascience-notebook:python-3.10.11 -f infra/docker/jupyterlab.Dockerfile .
-	docker push danielcristh0/datascience-notebook:python-3.10.11
+	docker build -t danielcristh0/jupyter/minimal-notebook:python-3.10 -f infra/docker/jupyterlab/jupyterlab.Dockerfile .
+	docker push danielcristh0/jupyter/minimal-notebook:python-3.10
 
 ## install kuberay operator using quickstart manifests
 kuberay:
@@ -135,5 +135,11 @@ jupyterhub-cluster:
 Jupyterhub-forward:
 	kubectl --namespace=jhub port-forward service/proxy-public 8080:http --address=0.0.0.0
 	kubectl --namespace=jhub port-forward service/hub 8081:8081 --address=0.0.0.0
+
+
+## Create kubernetes dashborad
+kube-dash:
+	kubectl -n kubernetes-dashboard create token admin-user
+	kubectl apply infra/kubernetes/admin-user.yaml
 
 
