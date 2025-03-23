@@ -134,7 +134,7 @@ jupyterhub-cluster:
 		--values /home/ubuntu/k3s-ray-jupyterlab/infra/jupyterlab-cluster/jupyterhub_config.yaml
 
 ## Expose jupyterhub
-Jupyterhub-forward:
+jupyterhub-forward:
 	kubectl --namespace=jhub port-forward service/proxy-public 8080:http --address=0.0.0.0
 	kubectl --namespace=jhub port-forward service/hub 8081:8081 --address=0.0.0.0
 
@@ -143,4 +143,6 @@ kube-dash:
 	kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.7.0/aio/deploy/recommended.yaml
 	kubectl apply -f infra/kubernetes/admin-user.yaml
 	kubectl -n kubernetes-dashboard create token admin-user
+	kubectl proxy --address=0.0.0.0 --accept-hosts='.*'
+
 
