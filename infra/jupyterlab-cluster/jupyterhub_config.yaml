@@ -16,10 +16,6 @@ hub:
     url: sqlite:////data/jupyterhub.sqlite
   service:
     type: ClusterIP
-  extraConfig:
-    00-connect-ray: |
-      import os
-      os.environ["RAY_ADDRESS"] = "ray://192.168.122.10:10001"
   extraVolumes:
     - name: jupyterhub-db
       persistentVolumeClaim:
@@ -37,12 +33,10 @@ proxy:
 
 singleuser:
   image:
-    name: "jupyter/minimal-notebook"
+    name: "danielcristh0/minimal-notebook"
     tag: "python-3.10"
   defaultUrl: "/lab"
   extraEnv:
-    JUPYTERHUB_API_URL: "http://hub.jhub:8081/hub/api"
-    RAY_ADDRESS: "ray://192.168.122.10:10001"
     GRANT_SUDO: "yes"
     NOTEBOOK_ARGS: "--allow-root"
     CHOWN_HOME: "yes"

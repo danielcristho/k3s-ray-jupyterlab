@@ -21,10 +21,12 @@ kuberay_version = 1.2.2
 # 	docker build -t localhost:5100/jupyterhub:latest -f infra/docker/jupyterhub.Dockerfile .
 # 	docker push localhost:5100/jupyterhub:latest
 
-# Build and push jupyter image to dockerhub
-publish-jupyterlab:
-	docker build -t danielcristh0/jupyter/minimal-notebook:python-3.10 -f infra/docker/jupyterlab/jupyterlab.Dockerfile .
-	docker push danielcristh0/jupyter/minimal-notebook:python-3.10
+# Build & tagging jupyterlab image
+build-jupyterlab:
+	docker build -t danielcristh0/minimal-notebook:python-3.10 -f infra/docker/jupyterlab/jupyterlab.Dockerfile .
+
+push-jupyterlab:
+	docker push danielcristh0/minimal-notebook:python-3.10
 
 ## install kuberay operator using quickstart manifests
 kuberay:
@@ -131,15 +133,14 @@ jupyterhub-cluster:
 		--version=4.0.0 \
 		--values /home/ubuntu/k3s-ray-jupyterlab/infra/jupyterlab-cluster/jupyterhub_config.yaml
 
-## expose jupyterhub
+## Expose jupyterhub
 Jupyterhub-forward:
 	kubectl --namespace=jhub port-forward service/proxy-public 8080:http --address=0.0.0.0
 	kubectl --namespace=jhub port-forward service/hub 8081:8081 --address=0.0.0.0
 
-
 ## Create kubernetes dashborad
 kube-dash:
+	kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.7.0/aio/deploy/recommended.yaml
+	kubectl apply -f infra/kubernetes/admin-user.yaml
 	kubectl -n kubernetes-dashboard create token admin-user
-	kubectl apply infra/kubernetes/admin-user.yaml
-
 
