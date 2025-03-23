@@ -1,1 +1,1 @@
-Managing Distributed GPU Infrastructure Usage Based on Docker Containers Using JupyterLab: A Final Thesis Project.
+Managing Distributed GPU Infrastructure Usage Based on Docker Containers Using JupyterLab: A Final Project.
