@@ -2,7 +2,7 @@ FROM jupyter/minimal-notebook:python-3.10
 
 USER root
 
-RUN pip install --no-cache-dir "ray[default, data, tune, serve, client]==2.12.0" jupyterhub
+RUN pip install --no-cache-dir "ray[default, data, tune, serve, client]==2.12.0" jupyterhub==5.2.1
 
 COPY jupyter_notebook_config.py /etc/jupyter/jupyter_notebook_config.py
 
