@@ -15,6 +15,7 @@ hub:
       http_timeout: 60
       pod_pending_timeout: 180
       image_pull_timeout: 120
+      hub_connect_url: http://hub.jhub.svc.cluster.local:8081
     Authenticator:
       admin_users:
         - admin
@@ -27,7 +28,7 @@ hub:
   extraVolumes:
     - name: jupyterhub-db
       persistentVolumeClaim:
-        claimName: jupyterhub-pvc
+        claimName: hub-db-dir
   extraVolumeMounts:
     - name: jupyterhub-db
       mountPath: /data
@@ -47,6 +48,9 @@ singleuser:
   defaultUrl: "/lab"
   extraEnv:
     JUPYTERHUB_SINGLEUSER_APP: "jupyter_server.serverapp.ServerApp"
+    JUPYTERHUB_LOG_LEVEL: "DEBUG"
+    JUPYTERHUB_CLIENT_MAX_RETRIES: "10"
+    JUPYTERHUB_CLIENT_CONNECT_IP: "hub.jhub.svc.cluster.local"
   storage:
     capacity: 1G
     dynamic:
