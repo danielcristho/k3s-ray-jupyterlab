@@ -3,6 +3,12 @@ hub:
     JupyterHub:
       authenticator_class: dummy
       shutdown_on_logout: True
+      proxy_api_ip: 0.0.0.0
+      proxy_api_port: 8001
+      bind_url: http://0.0.0.0:8081
+      hub_ip: 0.0.0.0
+      hub_port: 8081
+      log_level: DEBUG
     KubeSpawner:
       k8s_api_request_timeout: 60
       start_timeout: 120
@@ -12,10 +18,12 @@ hub:
     Authenticator:
       admin_users:
         - admin
-  db:
-    url: sqlite:////data/jupyterhub.sqlite
   service:
     type: ClusterIP
+    ports:
+      nodePort:
+  db:
+    url: sqlite:////data/jupyterhub.sqlite
   extraVolumes:
     - name: jupyterhub-db
       persistentVolumeClaim:
@@ -23,6 +31,13 @@ hub:
   extraVolumeMounts:
     - name: jupyterhub-db
       mountPath: /data
+  nodeSelector:
+    role: jupyterhub
+  tolerations:
+    - key: "dedicated"
+      operator: "Equal"
+      value: "jupyterhub"
+      effect: "NoSchedule"
 
 proxy:
   secretToken: "c413fe27d65c5916b7cf4028bf49a19b3056d59f2c2d1e79349244a6f758babe"
@@ -30,18 +45,22 @@ proxy:
     enabled: false
   service:
     type: ClusterIP
+  nodeSelector:
+    role: jupyterhub
+  tolerations:
+    - key: "dedicated"
+      operator: "Equal"
+      value: "jupyterhub"
+      effect: "NoSchedule"
 
 singleuser:
   image:
-    name: "danielcristh0/minimal-notebook"
-    tag: "python-3.10"
+    name: "danielcristh0/jupyterlab"
+    tag: "1.1"
+    pullPolicy: Always
   defaultUrl: "/lab"
   extraEnv:
-    GRANT_SUDO: "yes"
-    NOTEBOOK_ARGS: "--allow-root"
-    CHOWN_HOME: "yes"
-    CHOWN_HOME_OPTS: "-R"
-    CHOWN_EXTRA: "/home/jovyan/notebooks"
+    JUPYTERHUB_SINGLEUSER_APP: "jupyter_server.serverapp.ServerApp"
   storage:
     capacity: 1G
     dynamic:
@@ -53,8 +72,17 @@ singleuser:
   cpu:
     guarantee: 0.5
     limit: 1
+  nodeSelector:
+    role: jupyterhub
+  tolerations:
+    - key: "dedicated"
+      operator: "Equal"
+      value: "jupyterhub"
+      effect: "NoSchedule"
 
 cull:
   enabled: true
   timeout: 600
   every: 60
+  nodeSelector:
+    role: jupyterhub

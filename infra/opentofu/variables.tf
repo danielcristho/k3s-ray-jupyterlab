@@ -42,7 +42,7 @@ variable "master_hostname" {
 #application server
 variable "app_ips" {
   type    = list(any)
-  default = ["192.168.122.11"]
+  default = ["192.168.122.11", "192.168.122.12"]
 }
 
 variable "app_memory" {
@@ -62,5 +62,5 @@ variable "app_disk" {
 
 variable "app_hostname" {
   type    = list(string)
-  default = ["k3s-worker1"]
+  default = ["k3s-worker1","k3s-worker2"]
 }
