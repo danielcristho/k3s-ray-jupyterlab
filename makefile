@@ -8,32 +8,6 @@ service = raycluster-$(cluster)-head-svc
 # Jupyterhub
 jupyterhub_version = 4.0.0
 
-# ## Create private registry
-# registry:
-# 	docker run -d -p 5100:5000 --restart=always --name registry registry:2
-
-# ## Build and push images to private registry
-# publish:
-# 	docker build -t localhost:5100/ray:latest -f infra/docker/ray.Dockerfile .
-# 	docker build -t localhost:5100/jupyterhub:latest -f infra/docker/jupyterhub.Dockerfile .
-# 	docker push localhost:5100/ray:latest
-# 	docker push localhost:5100/jupyterhub:latest
-
-# publish-ray:
-# 	docker build -t localhost:5100/ray:latest -f infra/docker/ray.Dockerfile .
-# 	docker push localhost:5100/ray:latest
-
-# publish-jupyterhub:
-# 	docker build -t localhost:5100/jupyterhub:latest -f infra/docker/jupyterhub.Dockerfile .
-# 	docker push localhost:5100/jupyterhub:latest
-
-# Build & tagging jupyterlab image
-build-jupyterlab:
-	docker build -t danielcristh0/minimal-notebook:python-3.10 -f infra/docker/jupyterlab/jupyterlab.Dockerfile .
-
-push-jupyterlab:
-	docker push danielcristh0/minimal-notebook:python-3.10
-
 ## install network plugin
 network-plugin:
 	kubectl apply -f /home/ubuntu/k3s-ray-jupyterlab/infra/base/manifests/networks/calico.yaml
