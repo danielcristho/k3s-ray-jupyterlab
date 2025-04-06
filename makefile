@@ -1,6 +1,12 @@
 .PHONY: raycluster
 
+# Ray
 kuberay_version = 1.2.2
+cluster = kuberay
+service = raycluster-$(cluster)-head-svc
+
+# Jupyterhub
+jupyterhub_version = 4.0.0
 
 # ## Create private registry
 # registry:
@@ -43,16 +49,17 @@ kuberay:
 
 ## create ray cluster
 raycluster:
-	helm upgrade --install raycluster kuberay/ray-cluster --version $(kuberay_version) --values infra/kubernetes/ray/values.yaml --wait --debug > /dev/null
+	helm upgrade \
+		--install raycluster kuberay/ray-cluster \
+		--version $(kuberay_version) \
+		--values infra/kubernetes/ray/values.yaml \
+		--wait --debug > /dev/null
 # restart needed because of https://github.com/ray-project/kuberay/issues/234
 	make restart
 
 ## restart the ray cluster
 restart:
 	kubectl delete pod -lapp.kubernetes.io/name=kuberay --wait=false || true
-
-cluster = kuberay
-service = raycluster-$(cluster)-head-svc
 
 ## get shell on head pod
 shell:
@@ -120,17 +127,17 @@ jupyterhub-install:
 ## Create pvc
 jupyterhub-pvc:
 	kubectl create namespace jhub
-	kubectl apply -f /home/ubuntu/k3s-ray-jupyterlab/infra/jupyterlab-cluster/jupyterhub_pvc.yaml
+	kubectl apply -f /home/ubuntu/k3s-ray-jupyterlab/infra/kubernetes/jupyterlab/manifests/pvc.yaml
 
 ## Create JupyterHub cluster
 jupyterhub-cluster:
 	helm upgrade --cleanup-on-fail \
 		--install jhub jupyterhub/jupyterhub \
 		--namespace jhub \
-		--version=4.0.0 \
-		--values /home/ubuntu/k3s-ray-jupyterlab/infra/jupyterlab-cluster/jupyterhub_config.yaml
+		--version=$(jupyterhub_version) \
+		--values /home/ubuntu/k3s-ray-jupyterlab/infra/kubernetes/jupyterlab/values.yaml \
+		--wait --debug > /dev/null
 
 ## Expose jupyterhub
 jupyterhub-forward:
 	kubectl get svc -n jhub --no-headers | awk '{print $1}' | xargs -I{} bash -c "kubectl port-forward svc/{} -n jhub --address 0.0.0.0 \$(kubectl get svc {} -n jhub -o jsonpath='{.spec.ports[0].port}'):\$(kubectl get svc {} -n jhub -o jsonpath='{.spec.ports[0].port}') &"
-
