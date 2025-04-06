@@ -43,7 +43,7 @@ kuberay:
 
 ## create ray cluster
 raycluster:
-	helm upgrade --install raycluster kuberay/ray-cluster --version $(kuberay_version) --values infra/ray/values.yaml --wait --debug > /dev/null
+	helm upgrade --install raycluster kuberay/ray-cluster --version $(kuberay_version) --values infra/kubernetes/ray/values.yaml --wait --debug > /dev/null
 # restart needed because of https://github.com/ray-project/kuberay/issues/234
 	make restart
 
