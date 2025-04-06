@@ -28,17 +28,22 @@ build-jupyterlab:
 push-jupyterlab:
 	docker push danielcristh0/minimal-notebook:python-3.10
 
+## install network plugin
+network-plugin:
+	kubectl apply -f /home/ubuntu/k3s-ray-jupyterlab/infra/base/manifests/networks/calico.yaml
+
 ## install kuberay operator using quickstart manifests
 kuberay:
 # add helm repo and update to latest
 	kubectl label node k3s-worker1 node-role.kubernetes.io/worker=worker
+	kubectl label node k3s-worker2 node-role.kubernetes.io/worker=worker
 	helm repo add kuberay https://ray-project.github.io/kuberay-helm/
 	helm repo update kuberay
-	helm upgrade --install kuberay-operator kuberay/kuberay-operator --version $(kuberay_version) --wait --debug > /dev/null
+	# helm upgrade --install kuberay-operator kuberay/kuberay-operator --version $(kuberay_version) --wait --debug > /dev/null
 
 ## create ray cluster
 raycluster:
-	helm upgrade --install raycluster kuberay/ray-cluster --version $(kuberay_version) --values infra/ray-cluster/values.yaml --wait --debug > /dev/null
+	helm upgrade --install raycluster kuberay/ray-cluster --version $(kuberay_version) --values infra/ray/values.yaml --wait --debug > /dev/null
 # restart needed because of https://github.com/ray-project/kuberay/issues/234
 	make restart
 
@@ -48,14 +53,6 @@ restart:
 
 cluster = kuberay
 service = raycluster-$(cluster)-head-svc
-
-## install network plugin
-network-plugin:
-	kubectl apply -f /home/ubuntu/k3s-ray-jupyterlab/infra/ray-cluster/manifests/calico.yaml
-
-## enable 'local-path'
-local-path:
-	kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/master/deploy/local-path-storage.yaml
 
 ## get shell on head pod
 shell:
@@ -119,10 +116,10 @@ job-list: $(venv)
 jupyterhub-install:
 	helm repo add jupyterhub https://hub.jupyter.org/helm-chart
 	helm repo update
-	kubectl create namespace jhub
 
-## Add pvc
+## Create pvc
 jupyterhub-pvc:
+	kubectl create namespace jhub
 	kubectl apply -f /home/ubuntu/k3s-ray-jupyterlab/infra/jupyterlab-cluster/jupyterhub_pvc.yaml
 
 ## Create JupyterHub cluster
@@ -135,14 +132,5 @@ jupyterhub-cluster:
 
 ## Expose jupyterhub
 jupyterhub-forward:
-	kubectl --namespace=jhub port-forward service/proxy-public 8080:http --address=0.0.0.0
-	kubectl --namespace=jhub port-forward service/hub 8081:8081 --address=0.0.0.0
-
-## Create kubernetes dashborad
-kube-dash:
-	kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.7.0/aio/deploy/recommended.yaml
-	kubectl apply -f infra/kubernetes/admin-user.yaml
-	kubectl -n kubernetes-dashboard create token admin-user
-	kubectl proxy --address=0.0.0.0 --accept-hosts='.*'
-
+	kubectl get svc -n jhub --no-headers | awk '{print $1}' | xargs -I{} bash -c "kubectl port-forward svc/{} -n jhub --address 0.0.0.0 \$(kubectl get svc {} -n jhub -o jsonpath='{.spec.ports[0].port}'):\$(kubectl get svc {} -n jhub -o jsonpath='{.spec.ports[0].port}') &"
 
