@@ -1,23 +1,29 @@
 ---
-- name: Install kubernetes library for Python
+- name: Create virtual environment
+  ansible.builtin.command:
+    cmd: python3 -m venv /tmp/.venv
+    creates: /tmp/.venv
+
+- name: Install kubernetes library in virtual environment
   ansible.builtin.pip:
     name: kubernetes
+    virtualenv: /tmp/.venv
 
 - name: Clone ray project
   changed_when: false
   ansible.builtin.git:
     repo: https://github.com/danielcristho/k3s-ray-jupyterlab.git
-    dest: /home/debian/k3s-ray-jupyterlab
+    dest: /home/ray/k3s-ray-jupyterlab
     clone: true
 
 - name: Config Git global safe directory
-  ansible.builtin.command: git config --global --add safe.directory /home/debian/ray-jupyterlab-k3
+  ansible.builtin.command: git config --global --add safe.directory /home/ray/ray-jupyterlab-k3
   args:
-    creates: /home/debian/.gitconfig
+    creates: /home/ray/.gitconfig
   become: true
 
 - name: Install calico network plugin
   kubernetes.core.k8s:
-    kubeconfig: /home/debian/.kube/config
-    src: /home/debian/k3s-ray-jupyterlab/infra/ray-cluster/manifests/calico.yaml
+    kubeconfig: /home/ray/.kube/config
+    src: /home/ray/k3s-ray-jupyterlab/infra/ray-cluster/manifests/calico.yaml
     state: present

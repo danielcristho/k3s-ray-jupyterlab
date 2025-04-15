@@ -14,8 +14,8 @@
       - curl
       - software-properties-common
       - python3-pip
-      - virtualenv
       - python3-setuptools
+      - python3.11-venv
       - gnupg-agent
       - autoconf
       - dpkg-dev
@@ -28,5 +28,6 @@
       - re2c
       - wget
       - htop
+      - git
     state: present
     update_cache: true

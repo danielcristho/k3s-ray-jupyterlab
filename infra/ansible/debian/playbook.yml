@@ -2,7 +2,7 @@
 - name: Setup Master
   hosts: k3s_master
   become: true
-  remote_user: ubuntu
+  remote_user: ray
   roles:
     - config
     # - docker
@@ -14,7 +14,7 @@
     - k3s_worker_1
     - k3s_worker_2
   become: true
-  remote_user: ubuntu
+  remote_user: ray
   roles:
     - config
     - worker

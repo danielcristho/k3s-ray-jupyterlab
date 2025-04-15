@@ -10,10 +10,10 @@ disable_root: false
 chpasswd:
   list: |
     root:whoami
-    ubuntu:ray
+    ray:ray
   expire: false
 users:
-  - name: ubuntu
+  - name: ray
     groups:
       - sudo
     sudo: ["ALL=(ALL) NOPASSWD:ALL"]

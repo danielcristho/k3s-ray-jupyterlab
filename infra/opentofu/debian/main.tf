@@ -18,7 +18,7 @@ resource "libvirt_volume" "base" {
 resource "libvirt_cloudinit_disk" "master_commoninit" {
   count = length(var.master_hostname)
   name  = "${var.master_hostname[count.index]}-commoninit.iso"
-  user_data = templatefile("${path.module}/config/cloud_init.yml", {
+  user_data = templatefile("${path.module}/config/.cloud_init.yml", {
     hostname = var.master_hostname[count.index]
   })
   network_config = templatefile("${path.module}/config/network_config.yml", {
@@ -68,7 +68,7 @@ resource "libvirt_domain" "master" {
 resource "libvirt_cloudinit_disk" "app_commoninit" {
   count = length(var.app_hostname)
   name  = "${var.app_hostname[count.index]}-commoninit.iso"
-  user_data = templatefile("${path.module}/config/cloud_init.yml", {
+  user_data = templatefile("${path.module}/config/.cloud_init.yml", {
     hostname = var.app_hostname[count.index]
   })
   network_config = templatefile("${path.module}/config/network_config.yml", {
