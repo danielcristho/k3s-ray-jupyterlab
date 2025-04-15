@@ -1,18 +1,23 @@
 resource "null_resource" "cache_image" {
   triggers = {
-    always_run = timestamp()
+    image_url = var.debian12_img_url
   }
 
   provisioner "local-exec" {
-    command = "wget -O /tmp/debian-12.qcow2 ${var.debian12_img_url}"
+    command = "[ -f /tmp/debian-12.qcow2 ] || wget -O /tmp/debian-12.qcow2 ${var.debian12_img_url}"
   }
 }
+
 resource "libvirt_volume" "base" {
-  name       = "base.qcow2"
+  name       = "debian_base.qcow2"
   source     = "/tmp/debian-12.qcow2"
   pool       = "default"
   format     = "qcow2"
   depends_on = [null_resource.cache_image]
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 resource "libvirt_cloudinit_disk" "master_commoninit" {

@@ -22,8 +22,10 @@
     creates: /home/ray/.gitconfig
   become: true
 
-- name: Install calico network plugin
+- name: Apply calico network plugin
   kubernetes.core.k8s:
     kubeconfig: /home/ray/.kube/config
-    src: /home/ray/k3s-ray-jupyterlab/infra/ray-cluster/manifests/calico.yaml
+    src: /home/ray/k3s-ray-jupyterlab/infra/kubernetes/base/manifests/networks/calico.yaml
     state: present
+  vars:
+    ansible_python_interpreter: /tmp/.venv/bin/python
