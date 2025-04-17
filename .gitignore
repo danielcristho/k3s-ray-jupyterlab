@@ -1,6 +1,3 @@
-# Vagrant
-.vagrant/
-
 # Local .terraform directories
 **/.terraform/*
 
@@ -43,8 +40,10 @@ terraform.rc
 token
 kubeconfig
 
-# Config
+# VM Config
 .cloud_init.yml
+.cloud_init.tftpl
+.vagrant/
 
 # Python
 env/
