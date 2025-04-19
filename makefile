@@ -19,7 +19,7 @@ kuberay:
 	kubectl label node k3s-worker2 node-role.kubernetes.io/worker=worker
 	helm repo add kuberay https://ray-project.github.io/kuberay-helm/
 	helm repo update kuberay
-	# helm upgrade --install kuberay-operator kuberay/kuberay-operator --version $(kuberay_version) --wait --debug > /dev/null
+	helm upgrade --install kuberay-operator kuberay/kuberay-operator --version $(kuberay_version) --wait --debug > /dev/null
 
 ## create ray cluster
 raycluster:
