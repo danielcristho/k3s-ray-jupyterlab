@@ -10,7 +10,7 @@ jupyterhub_version = 4.0.0
 
 ## install network plugin
 network-plugin:
-	kubectl apply -f /home/ubuntu/k3s-ray-jupyterlab/infra/base/manifests/networks/calico.yaml
+	kubectl apply -f /home/ray/k3s-ray-jupyterlab/infra/base/manifests/networks/calico.yaml
 
 ## install kuberay operator using quickstart manifests
 kuberay:
@@ -101,7 +101,7 @@ jupyterhub-install:
 ## Create pvc
 jupyterhub-pvc:
 	kubectl create namespace jhub
-	kubectl apply -f /home/ubuntu/k3s-ray-jupyterlab/infra/kubernetes/jupyterlab/manifests/pvc.yaml
+	kubectl apply -f /home/ray/k3s-ray-jupyterlab/infra/kubernetes/jupyterlab/manifests/pvc.yaml
 
 ## Create JupyterHub cluster
 jupyterhub-cluster:
@@ -109,7 +109,7 @@ jupyterhub-cluster:
 		--install jhub jupyterhub/jupyterhub \
 		--namespace jhub \
 		--version=$(jupyterhub_version) \
-		--values /home/ubuntu/k3s-ray-jupyterlab/infra/kubernetes/jupyterlab/values.yaml \
+		--values /home/ray/k3s-ray-jupyterlab/infra/kubernetes/jupyterlab/values.yaml \
 		--wait --debug > /dev/null
 
 ## Expose jupyterhub
