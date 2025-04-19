@@ -2,31 +2,39 @@ hub:
   config:
     JupyterHub:
       authenticator_class: dummy
-      shutdown_on_logout: True
-      proxy_api_ip: 0.0.0.0
-      proxy_api_port: 8001
+      shutdown_on_logout: true
       bind_url: http://0.0.0.0:8081
-      hub_ip: 0.0.0.0
-      hub_port: 8081
-      log_level: DEBUG
     KubeSpawner:
       k8s_api_request_timeout: 60
-      start_timeout: 120
-      http_timeout: 60
-      pod_pending_timeout: 180
-      image_pull_timeout: 120
-      hub_connect_url: http://hub.jhub.svc.cluster.local:8081
+      start_timeout: 300
+      http_timeout: 300
     Authenticator:
       admin_users:
         - admin
-  service:
-    type: ClusterIP
+
+  livenessProbe:
+    initialDelaySeconds: 180
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 10
+
+  readinessProbe:
+    initialDelaySeconds: 60
+    periodSeconds: 5
+    timeoutSeconds: 5
+    failureThreshold: 6
+
   db:
     url: sqlite:////data/jupyterhub.sqlite
+
+  service:
+    type: ClusterIP
+
   extraVolumes:
     - name: jupyterhub-db
       persistentVolumeClaim:
-        claimName: hub-db-dir
+        claimName: jupyterhub-pvc
+
   extraVolumeMounts:
     - name: jupyterhub-db
       mountPath: /data
@@ -42,13 +50,7 @@ singleuser:
   image:
     name: "danielcristh0/jupyterlab"
     tag: "1.1"
-    pullPolicy: Always
   defaultUrl: "/lab"
-  extraEnv:
-    JUPYTERHUB_SINGLEUSER_APP: "jupyter_server.serverapp.ServerApp"
-    JUPYTERHUB_LOG_LEVEL: "DEBUG"
-    JUPYTERHUB_CLIENT_MAX_RETRIES: "10"
-    JUPYTERHUB_CLIENT_CONNECT_IP: "hub.jhub.svc.cluster.local"
   storage:
     capacity: 1G
     dynamic:

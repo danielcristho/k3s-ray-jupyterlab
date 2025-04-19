@@ -114,4 +114,4 @@ jupyterhub-cluster:
 
 ## Expose jupyterhub
 jupyterhub-forward:
-	kubectl port-forward svc/proxy-public -n jhub 8000:80 --address 0.0.0.0
+	kubectl --namespace=jhub port-forward service/proxy-public 8080:http --address 0.0.0.0

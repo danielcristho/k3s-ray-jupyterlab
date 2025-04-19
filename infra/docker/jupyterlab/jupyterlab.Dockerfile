@@ -28,6 +28,9 @@ RUN --mount=type=cache,target=${PIP_CACHE_DIR} \
         --wheel-dir=/tmp/wheels \
         -r requirements.txt
 
+
+ENV PATH="$HOME/.local/bin:$PATH"
+
 # The final stage
 # ---------------
 #
@@ -75,9 +78,9 @@ USER ${NB_USER}
 
 # COPY jupyter_notebook_config.py /etc/jupyter/jupyter_notebook_config.py
 
-# COPY 00-ray-init.py /tmp/00-ray-init.py
+COPY 00-ray-init.py /tmp/00-ray-init.py
 
-# ENV RAY_ADDRESS="ray://192.168.122.10:10001"
+ENV RAY_ADDRESS="ray://192.168.122.10:10001"
 
 EXPOSE 8888
 
