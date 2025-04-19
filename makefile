@@ -100,7 +100,7 @@ jupyterhub-install:
 
 ## Create pvc
 jupyterhub-pvc:
-	kubectl create namespace jhub
+	kubectl create namespace jhub --dry-run=client -o yaml | kubectl apply -f -
 	kubectl apply -f /home/ray/k3s-ray-jupyterlab/infra/kubernetes/jupyterlab/manifests/pvc.yaml
 
 ## Create JupyterHub cluster
@@ -110,8 +110,8 @@ jupyterhub-cluster:
 		--namespace jhub \
 		--version=$(jupyterhub_version) \
 		--values /home/ray/k3s-ray-jupyterlab/infra/kubernetes/jupyterlab/values.yaml \
-		--wait --debug > /dev/null
+		--wait --debug
 
 ## Expose jupyterhub
 jupyterhub-forward:
-	kubectl get svc -n jhub --no-headers | awk '{print $1}' | xargs -I{} bash -c "kubectl port-forward svc/{} -n jhub --address 0.0.0.0 \$(kubectl get svc {} -n jhub -o jsonpath='{.spec.ports[0].port}'):\$(kubectl get svc {} -n jhub -o jsonpath='{.spec.ports[0].port}') &"
+	kubectl port-forward svc/proxy-public -n jhub 8000:80 --address 0.0.0.0

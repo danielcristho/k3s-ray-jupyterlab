@@ -21,8 +21,6 @@ hub:
         - admin
   service:
     type: ClusterIP
-    ports:
-      nodePort:
   db:
     url: sqlite:////data/jupyterhub.sqlite
   extraVolumes:
@@ -62,6 +60,9 @@ singleuser:
   cpu:
     guarantee: 0.5
     limit: 1
+
+persistence:
+  enabled: false
 
 cull:
   enabled: true
