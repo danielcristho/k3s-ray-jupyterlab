@@ -61,9 +61,6 @@ singleuser:
     guarantee: 0.5
     limit: 1
 
-persistence:
-  enabled: false
-
 cull:
   enabled: true
   timeout: 600
