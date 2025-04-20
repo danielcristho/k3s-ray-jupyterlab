@@ -50,6 +50,7 @@ singleuser:
   image:
     name: "danielcristh0/jupyterlab"
     tag: "1.1"
+    pullPolicy: Always
   defaultUrl: "/lab"
   storage:
     capacity: 1G

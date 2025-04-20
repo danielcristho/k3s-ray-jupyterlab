@@ -3,7 +3,7 @@
 image:
   repository: danielcristh0/ray
   tag: 1.1
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
 
 head:
   enableInTreeAutoscaling: true
