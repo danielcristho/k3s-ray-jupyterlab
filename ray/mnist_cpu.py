@@ -48,7 +48,6 @@ def build_and_compile_cnn_model(config):
     )
     return model
 
-
 def train_func(config):
     per_worker_batch_size = config.get("batch_size", 64)
     epochs = config.get("epochs", 3)

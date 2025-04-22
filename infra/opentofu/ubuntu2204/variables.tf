@@ -36,7 +36,7 @@ variable "master_disk" {
 
 variable "master_hostname" {
   type    = list(string)
-  default = ["k3s-master"]
+  default = ["mastere"]
 }
 
 #application server
@@ -62,5 +62,5 @@ variable "app_disk" {
 
 variable "app_hostname" {
   type    = list(string)
-  default = ["k3s-worker1","k3s-worker2"]
+  default = ["ajk-workere-1","ajk-workere-2"]
 }

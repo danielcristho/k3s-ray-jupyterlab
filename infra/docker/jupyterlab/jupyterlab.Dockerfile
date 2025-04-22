@@ -10,7 +10,7 @@
 # NOTE: If the image version is updated, also update it in ci/refreeze and
 #       hub's Dockerfile!
 #
-FROM python:3.12-bookworm as build-stage
+FROM python:3.10.14-bookworm as build-stage
 
 # Build wheels
 #
@@ -34,7 +34,7 @@ ENV PATH="$HOME/.local/bin:$PATH"
 # The final stage
 # ---------------
 #
-FROM python:3.12-slim-bookworm
+FROM python:3.10.14-slim-bookworm
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -74,17 +74,20 @@ RUN --mount=type=cache,target=${PIP_CACHE_DIR} \
 
 WORKDIR ${HOME}
 
-USER ${NB_USER}
-
-# COPY jupyter_notebook_config.py /etc/jupyter/jupyter_notebook_config.py
+ENV RAY_ADDRESS="ray://192.168.122.10:10001"
 
 COPY 00-ray-init.py /tmp/00-ray-init.py
 
-ENV RAY_ADDRESS="ray://192.168.122.10:10001"
+COPY jupyter_notebook_config.py /etc/jupyter/jupyter_notebook_config.py
+
+USER ${NB_USER}
 
 EXPOSE 8888
 
 ENTRYPOINT ["tini", "--"]
 
-# CMD ["jupyter", "lab"]
-CMD ["jupyterhub-singleuser", "--ip=0.0.0.0"]
+CMD ["bash", "-c", "\
+    mkdir -p /home/jovyan/.ipython/profile_default/startup && \
+    cp /tmp/00-ray-init.py /home/jovyan/.ipython/profile_default/startup/ && \
+    start-notebook.sh \
+"]

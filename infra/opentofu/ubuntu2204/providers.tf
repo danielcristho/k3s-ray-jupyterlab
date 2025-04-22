@@ -8,5 +8,5 @@ terraform {
 }
 
 provider "libvirt" {
-  uri = "qemu:///system"
+  uri = "qemu+ssh://ajklab@10.21.78.113/system"
 }
