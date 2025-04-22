@@ -5,9 +5,9 @@ This project aims to implement a distributed GPU infrastructure management syste
 ## Progress
 
 - [x] Deployed RAY Cluster on K3S
-- [x] Create custom docker image for RAY and Jupyterlab
+- [x] Create custom Docker image for RAY and Jupyterlab
 - [x] JupyterHub integrated and accessible to users
-- [x] JupyterLab with Ray auto-connect
+- [x] JupyterLab with RAY auto-connect
 - [x] Ray tasks distributed and tracked across nodes
 
 ## To-do
@@ -17,3 +17,4 @@ This project aims to implement a distributed GPU infrastructure management syste
 - [ ] Evaluate and log user-level GPU usage metrics
 - [ ] Secure access and auth with JupyterHub (OAuth, TLS)
 - [ ] Create UI/dashboard for monitoring task and resource usage
+- [ ] ...
