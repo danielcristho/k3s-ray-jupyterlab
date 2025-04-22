@@ -50,3 +50,7 @@ env/
 venv/
 .env/
 .venv/
+
+# Personal Lab
+netics
+rpl

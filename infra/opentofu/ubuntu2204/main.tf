@@ -1,12 +1,13 @@
 resource "null_resource" "cache_image" {
   triggers = {
-    mage_url = var.ubuntu_22_img_url
+    image_url = var.ubuntu_22_img_url
   }
 
   provisioner "local-exec" {
-    command = "[ -f /tmp/base.qcow2 ] || wget -O /tmp/base.qcow2 ${var.ubuntu_22_img_url}"
+    command = "[ -f /tmp/ubuntu-22.04.qcow2 ] || wget -O /tmp/ubuntu-22.04.qcow2 ${var.ubuntu_22_img_url}"
   }
 }
+
 resource "libvirt_volume" "base" {
   name       = "base.qcow2"
   source     = "/tmp/ubuntu-22.04.qcow2"
