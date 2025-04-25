@@ -1,0 +1,20 @@
+---
+- name: Setup Master
+  hosts: rpl_master
+  become: true
+  remote_user: root
+  roles:
+    - config
+    # - docker
+    - master
+    - manage-cluster
+
+- name: Setup Worker
+  hosts:
+    - rpl_worker_1
+    - rpl_worker_2
+  become: true
+  remote_user: root
+  roles:
+    - config
+    - worker

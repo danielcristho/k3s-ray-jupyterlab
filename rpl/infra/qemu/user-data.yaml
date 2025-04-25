@@ -1,0 +1,26 @@
+#cloud-config
+hostname: ray-vm
+users:
+  - name: ray
+    gecos: ray
+    groups: [sudo]
+    sudo: ["ALL=(ALL) NOPASSWD:ALL"]
+    home: /home/ray
+    shell: /bin/bash
+    lock_passwd: false
+    ssh_authorized_keys:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILnbiFnwahDaIl3UpgIviSSa319z4RnNcwbRPk7fPUQZ daniel@rpl
+chpasswd:
+  list: |
+    root:whoami
+  expire: false
+ssh_pwauth: true
+disable_root: false
+runcmd:
+  - sed -i '/PermitRootLogin/d' /etc/ssh/sshd_config
+  - echo "PermitRootLogin yes" >> /etc/ssh/sshd_config
+  - systemctl restart sshd
+  - apt-get update
+  - apt-get install -y qemu-guest-agent
+  - systemctl enable qemu-guest-agent
+  - systemctl start qemu-guest-agen

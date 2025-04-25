@@ -1,0 +1,31 @@
+# see https://github.com/ray-project/kuberay/tree/master/helm-chart/ray-cluster
+# and https://docs.ray.io/en/latest/cluster/kubernetes/user-guides/config.html
+image:
+  repository: danielcristh0/ray
+  tag: 1.1
+  pullPolicy: Always
+
+head:
+  enableInTreeAutoscaling: true
+  rayStartParams:
+    # don't use head node for scheduling
+    # as per https://github.com/ray-project/kuberay/blob/master/docs/best-practice/worker-head-reconnection.md#best-p>
+    num-cpus: 0
+  resources:
+    limits:
+      cpu: "2"
+      memory: "2G"
+    requests:
+      cpu: "2"
+      memory: "2G"
+
+worker:
+  minReplicas: 1
+  maxReplicas: 2
+  resources:
+    limits:
+      cpu: "1"
+      memory: "1G"
+    requests:
+      cpu: "1"
+      memory: "1G"
