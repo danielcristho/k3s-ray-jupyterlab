@@ -2,7 +2,7 @@
 - name: Setup Master
   hosts: rpl_master
   become: true
-  remote_user: root
+  remote_user: ray
   roles:
     - config
     # - docker
@@ -14,7 +14,7 @@
     - rpl_worker_1
     - rpl_worker_2
   become: true
-  remote_user: root
+  remote_user: ray
   roles:
     - config
     - worker
