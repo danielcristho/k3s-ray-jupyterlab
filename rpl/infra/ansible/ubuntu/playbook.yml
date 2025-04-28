@@ -1,6 +1,6 @@
 ---
 - name: Setup Master
-  hosts: rpl_master
+  hosts: rpl-master
   become: true
   remote_user: ray
   roles:
@@ -11,8 +11,8 @@
 
 - name: Setup Worker
   hosts:
-    - rpl_worker_1
-    - rpl_worker_2
+    - rpl-worker-1
+    - rpl-worker-2
   become: true
   remote_user: ray
   roles:

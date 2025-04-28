@@ -8,7 +8,7 @@ CLOUDINIT_DIR="/var/tmp/cloudinit"
 mkdir -p "$CLOUDINIT_DIR"
 
 # Define VM configurations
-VM_NAMES=("rpl_master" "rpl_worker_1" "rpl_worker_2")
+VM_NAMES=("rpl-master" "rpl-worker-1" "rpl-worker-2")
 STATIC_IPS=("192.168.122.50" "192.168.122.51" "192.168.122.52")
 
 # VM resources
@@ -28,8 +28,11 @@ for i in "${!VM_NAMES[@]}"; do
   # Clone base image
   qemu-img create -f qcow2 -F qcow2 -b "$BASE_IMAGE" "$IMAGES_DIR/${VM_NAME}.qcow2" 25G
 
-  # Create user-data
-  cat > "$CLOUDINIT_DIR/user-data" <<EOF
+  # Create per-VM user-data
+  USER_DATA_FILE="$CLOUDINIT_DIR/user-data-$VM_NAME"
+  NETWORK_CONFIG_FILE="$CLOUDINIT_DIR/network-config-$VM_NAME"
+
+  cat > "$USER_DATA_FILE" <<EOF
 #cloud-config
 hostname: $VM_NAME
 users:
@@ -58,8 +61,8 @@ runcmd:
   - systemctl start qemu-guest-agent
 EOF
 
-  # Create network-config
-  cat > "$CLOUDINIT_DIR/network-config" <<EOF
+  # Create per-VM network-config
+  cat > "$NETWORK_CONFIG_FILE" <<EOF
 version: 2
 ethernets:
   enp1s0:
@@ -71,9 +74,9 @@ ethernets:
 EOF
 
   # Generate seed.iso
-  cloud-localds --network-config "$CLOUDINIT_DIR/network-config" "$IMAGES_DIR/seed-${VM_NAME}.iso" "$CLOUDINIT_DIR/user-data"
+  cloud-localds --network-config "$NETWORK_CONFIG_FILE" "$IMAGES_DIR/seed-${VM_NAME}.iso" "$USER_DATA_FILE"
 
-  # Creating VMS with virt command
+  # Create VM with virt-install
   virt-install \
     --name "$VM_NAME" \
     --memory "$RAM_MB" \

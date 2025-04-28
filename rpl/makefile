@@ -10,13 +10,13 @@ jupyterhub_version = 4.0.0
 
 ## install network plugin
 network-plugin:
-	kubectl apply -f /home/ray/k3s-ray-jupyterlab/infra/base/manifests/networks/calico.yaml
+	kubectl apply -f /home/ray/k3s-ray-jupyterlab/infra/kubernetes/base/manifests/networks/calico.yaml
 
 ## install kuberay operator using quickstart manifests
 kuberay:
 # add helm repo and update to latest
-	kubectl label node k3s-worker1 node-role.kubernetes.io/worker=worker
-	kubectl label node k3s-worker2 node-role.kubernetes.io/worker=worker
+	kubectl label node rpl-worker-1 node-role.kubernetes.io/worker=worker
+	kubectl label node rpl-worker-2  node-role.kubernetes.io/worker=worker
 	helm repo add kuberay https://ray-project.github.io/kuberay-helm/
 	helm repo update kuberay
 	helm upgrade --install kuberay-operator kuberay/kuberay-operator --version $(kuberay_version) --wait --debug > /dev/null

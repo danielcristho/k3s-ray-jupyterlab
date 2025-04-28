@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Delete all running VMs
+
 for vm in $(virsh list --name); do
   echo "Shutting down $vm..."
   virsh destroy "$vm"
