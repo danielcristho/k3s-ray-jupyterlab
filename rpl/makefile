@@ -101,7 +101,7 @@ jupyterhub-install:
 ## Create pvc
 jupyterhub-pvc:
 	kubectl create namespace jhub --dry-run=client -o yaml | kubectl apply -f -
-	kubectl apply -f /home/ray/k3s-ray-jupyterlab/rpl/kubernetes/jupyterlab/manifests/pvc.yaml
+	kubectl apply -f /home/ray/k3s-ray-jupyterlab/rpl/infra/kubernetes/jupyterlab/manifests/pvc.yaml
 
 ## Create JupyterHub cluster
 jupyterhub-cluster:
