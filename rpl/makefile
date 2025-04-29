@@ -15,8 +15,8 @@ network-plugin:
 ## install kuberay operator using quickstart manifests
 kuberay:
 # add helm repo and update to latest
-	kubectl label node rpl-worker-1 node-role.kubernetes.io/worker=worker
-	kubectl label node rpl-worker-2  node-role.kubernetes.io/worker=worker
+	kubectl label node rpl_worker_1 node-role.kubernetes.io/worker=worker
+	kubectl label node rpl_worker_1  node-role.kubernetes.io/worker=worker
 	helm repo add kuberay https://ray-project.github.io/kuberay-helm/
 	helm repo update kuberay
 	helm upgrade --install kuberay-operator kuberay/kuberay-operator --version $(kuberay_version) --wait --debug > /dev/null

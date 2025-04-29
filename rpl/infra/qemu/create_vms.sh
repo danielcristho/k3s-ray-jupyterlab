@@ -12,8 +12,8 @@ VM_NAMES=("rpl-master" "rpl-worker-1" "rpl-worker-2")
 STATIC_IPS=("192.168.122.50" "192.168.122.51" "192.168.122.52")
 
 # VM resources
-RAM_MB=4096
-VCPUS=2
+RAM_MB=8192
+VCPUS=4
 
 # SSH public key
 SSH_KEY="ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILnbiFnwahDaIl3UpgIviSSa319z4RnNcwbRPk7fPUQZ daniel@rpl"

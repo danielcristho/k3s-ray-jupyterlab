@@ -2,7 +2,7 @@ import os
 import ray
 import socket
 
-RAY_ADDRESS = os.getenv("RAY_ADDRESS", "ray://192.168.122.10:10001")
+RAY_ADDRESS = os.getenv("RAY_ADDRESS", "ray://192.168.122.50:10001")
 
 def log(msg):
     print(f"[Ray Autoconnect] {msg}")
