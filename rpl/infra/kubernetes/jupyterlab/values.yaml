@@ -49,7 +49,7 @@ proxy:
 singleuser:
   image:
     name: "danielcristh0/jupyterlab"
-    tag: "1.1"
+    tag: "rpl"
     pullPolicy: Always
   defaultUrl: "/lab"
   storage:
