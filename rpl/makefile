@@ -10,7 +10,7 @@ jupyterhub_version = 4.0.0
 
 ## install network plugin
 network-plugin:
-	kubectl apply -f /home/ray/k3s-ray-jupyterlab/infra/kubernetes/base/manifests/networks/calico.yaml
+	kubectl apply -f /home/ray/k3s-ray-jupyterlab/rpl/infra/kubernetes/base/manifests/networks/calico.yaml
 
 ## install kuberay operator using quickstart manifests
 kuberay:
@@ -26,7 +26,7 @@ raycluster:
 	helm upgrade \
 		--install raycluster kuberay/ray-cluster \
 		--version $(kuberay_version) \
-		--values infra/kubernetes/ray/values.yaml \
+		--values rpl/infra/kubernetes/ray/values.yaml \
 		--wait --debug > /dev/null
 # restart needed because of https://github.com/ray-project/kuberay/issues/234
 	make restart
@@ -101,7 +101,7 @@ jupyterhub-install:
 ## Create pvc
 jupyterhub-pvc:
 	kubectl create namespace jhub --dry-run=client -o yaml | kubectl apply -f -
-	kubectl apply -f /home/ray/k3s-ray-jupyterlab/infra/kubernetes/jupyterlab/manifests/pvc.yaml
+	kubectl apply -f /home/ray/k3s-ray-jupyterlab/rpl/kubernetes/jupyterlab/manifests/pvc.yaml
 
 ## Create JupyterHub cluster
 jupyterhub-cluster:
@@ -109,7 +109,7 @@ jupyterhub-cluster:
 		--install jhub jupyterhub/jupyterhub \
 		--namespace jhub \
 		--version=$(jupyterhub_version) \
-		--values /home/ray/k3s-ray-jupyterlab/infra/kubernetes/jupyterlab/values.yaml \
+		--values /home/ray/k3s-ray-jupyterlab/rpl/kubernetes/jupyterlab/values.yaml \
 		--wait --debug
 
 ## Expose jupyterhub
