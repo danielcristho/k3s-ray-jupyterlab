@@ -109,7 +109,7 @@ jupyterhub-cluster:
 		--install jhub jupyterhub/jupyterhub \
 		--namespace jhub \
 		--version=$(jupyterhub_version) \
-		--values /home/ray/k3s-ray-jupyterlab/rpl/kubernetes/jupyterlab/values.yaml \
+		--values /home/ray/k3s-ray-jupyterlab/rpl/infra/kubernetes/jupyterlab/values.yaml \
 		--wait --debug
 
 ## Expose jupyterhub
