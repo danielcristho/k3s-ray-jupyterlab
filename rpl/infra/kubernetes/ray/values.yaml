@@ -2,7 +2,7 @@
 # and https://docs.ray.io/en/latest/cluster/kubernetes/user-guides/config.html
 image:
   repository: danielcristh0/ray
-  tag: 1.1
+  tag: rpl
   pullPolicy: Always
 
 head:
