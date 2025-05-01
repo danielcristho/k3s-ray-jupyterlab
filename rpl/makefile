@@ -8,9 +8,16 @@ service = raycluster-$(cluster)-head-svc
 # Jupyterhub
 jupyterhub_version = 4.0.0
 
-## install network plugin
+## install kubernetes network plugin
 network-plugin:
-	kubectl apply -f /home/ray/k3s-ray-jupyterlab/rpl/infra/kubernetes/base/manifests/networks/calico.yaml
+	kubectl apply -f /home/ray/k3s-ray-jupyterlab/infra/base/manifests/networks/calico.yaml
+
+## install nvidia kubernetes plugin
+nvidia-plugin:
+	helm repo add nvdp https://nvidia.github.io/k8s-device-plugin \
+	&& helm repo update
+	helm install --generate-name nvdp/nvidia-device-plugin --namespace kube-system
+	kubectl get pods -n kube-system|grep -i nvidia
 
 ## install kuberay operator using quickstart manifests
 kuberay:
