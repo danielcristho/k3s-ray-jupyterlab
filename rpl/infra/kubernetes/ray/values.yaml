@@ -15,9 +15,11 @@ head:
     limits:
       cpu: "2"
       memory: "4G"
+      nvidia.com/gpu: 1
     requests:
       cpu: "2"
       memory: "4G"
+      nvidia.com/gpu: 1
 
 worker:
   minReplicas: 1
