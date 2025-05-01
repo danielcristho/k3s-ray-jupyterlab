@@ -2,7 +2,7 @@
 # and https://docs.ray.io/en/latest/cluster/kubernetes/user-guides/config.html
 image:
   repository: danielcristh0/ray
-  tag: rpl
+  tag: 1.1
   pullPolicy: Always
 
 head:
@@ -14,18 +14,23 @@ head:
   resources:
     limits:
       cpu: "2"
-      memory: "2G"
+      memory: "4G"
     requests:
       cpu: "2"
-      memory: "2G"
+      memory: "4G"
 
 worker:
   minReplicas: 1
   maxReplicas: 2
+  rayStartParams:
+    num-cpus: "2"
+    num-gpus: "1"
   resources:
     limits:
-      cpu: "1"
-      memory: "1G"
+      cpu: "2"
+      memory: "4G"
+      nvidia.com/gpu: 1
     requests:
-      cpu: "1"
-      memory: "1G"
+      cpu: "2"
+      memory: "4G"
+      nvidia.com/gpu: 1
