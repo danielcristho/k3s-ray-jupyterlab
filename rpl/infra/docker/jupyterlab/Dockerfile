@@ -6,7 +6,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
     NB_USER=jovyan \
     NB_UID=1000 \
     HOME=/home/jovyan \
-    RAY_ADDRESS=ray://192.168.122.10:10001
+    RAY_ADDRESS=ray://192.168.122.50:10001
 
 # Create user
 RUN adduser \
