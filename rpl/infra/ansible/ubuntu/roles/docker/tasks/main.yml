@@ -15,14 +15,20 @@
     name:
       - docker-ce
       - docker-ce-cli
+      - containerd.io
     state: present
     update_cache: true
 
-- name: Add non-root to docker group
-  ansible.builtin.shell: |
-    sudo groupadd docker
-    sudo usermod -aG docker $USER
-    newgrp docker
+- name: Create docker group
+  ansible.builtin.group:
+    name: docker
+    state: present
+
+- name: Add user to docker group
+  ansible.builtin.user:
+    name: "{{ ansible_user }}"
+    groups: docker
+    append: yes
 
 - name: Install Docker module for Python
   ansible.builtin.pip:
@@ -39,14 +45,30 @@
     cmd: ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
     creates: /usr/bin/docker-compose
 
-- name: Configure private registry
-  ansible.builtin.template:
-    src: daemon.j2
-    dest: /etc/docker/daemon.json
-    mode: preserve
+# - name: Configure private registry
+#   ansible.builtin.template:
+#     src: daemon.j2
+#     dest: /etc/docker/daemon.json
+#     mode: preserve
+
+- name: Install NVIDIA Container Toolkit
+  ansible.builtin.apt:
+    name:
+      - nvidia-container-toolkit
+    state: present
 
 - name: Restart Docker
   ansible.builtin.service:
     name: docker
     state: restarted
     enabled: true
+
+- name: Test GPU with Docker
+  ansible.builtin.command:
+    cmd: docker run --rm --gpus all nvidia/cuda:12.2.0-base-ubuntu22.04 nvidia-smi
+  register: gpu_test
+  ignore_errors: true
+
+- name: Print GPU test result
+  ansible.builtin.debug:
+    var: gpu_test.stdout

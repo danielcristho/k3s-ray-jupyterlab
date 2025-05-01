@@ -5,7 +5,7 @@
   remote_user: ray
   roles:
     - config
-    # - docker
+    - docker
     - master
     - manage-cluster
 
