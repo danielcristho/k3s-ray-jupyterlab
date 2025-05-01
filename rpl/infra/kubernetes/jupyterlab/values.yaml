@@ -66,10 +66,8 @@ singleuser:
 
 cull:
   enabled: true
-  timeout: 600
+  timeout: 1800       # naikkan timeout ke 30 menit
   every: 60
   maxAge: 0
   users: false
   removeNamedServers: false
-  cull_connected: false
-  cull_idle_timeout: 600
