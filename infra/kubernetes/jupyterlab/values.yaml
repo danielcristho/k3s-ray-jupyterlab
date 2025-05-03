@@ -65,6 +65,10 @@ singleuser:
     limit: 1
 
 cull:
-  enabled: true
-  timeout: 600
-  every: 60
+  enabled: true                # Enable culling of idle JupyterLab servers
+  timeout: 1800                # Timeout in seconds before stopping an idle server (30 minutes)
+  every: 60                    # Interval in seconds to check for idle servers (1 minute)
+  maxAge: 0                    # Maximum age of a server in seconds; 0 means no age limit
+  users: false                 # Do not cull users from the Hub, only their servers
+  removeNamedServers: false   # Do not remove named servers when culling
+
