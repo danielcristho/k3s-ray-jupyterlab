@@ -1,10 +1,6 @@
 .PHONY: raycluster
 
-# Load environment variables from .env
-ifneq (,$(wildcard .env))
-	include .env
-	export
-endif
+include .env
 
 # Ray
 kuberay_version = $(KUBERAY_VERSION)
@@ -18,7 +14,7 @@ head_ip = $(HEAD_IP)
 
 ## install kubernetes network plugin
 network-plugin:
-	kubectl apply -f $(project_path)/infra/base/manifests/networks/calico.yaml
+	kubectl apply -f $(project_path)/infra/kubernetes/base/manifests/networks/calico.yaml
 
 ## install nvidia kubernetes operator
 nvidia-operator:

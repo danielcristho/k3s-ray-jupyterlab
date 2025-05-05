@@ -1,7 +1,17 @@
 ---
-- name: Install kubernetes library for Python
-  ansible.builtin.pip:
-    name: kubernetes
+- name: Ensure python3-venv is installed
+  apt:
+    name: python3-venv
+    state: present
+  become: true
+
+- name: Create Python virtual environment for Ray
+  command: python3 -m venv /opt/ray-env
+  args:
+    creates: /opt/ray-env
+
+- name: Install kubernetes library for Python using virtualenv
+  command: /opt/ray-env/bin/pip install kubernetes
 
 - name: Clone ray project
   changed_when: false
