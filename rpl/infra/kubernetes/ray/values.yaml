@@ -23,10 +23,10 @@ head:
 
 worker:
   minReplicas: 1
-  maxReplicas: 4
+  maxReplicas: 3
   rayStartParams:
     num-cpus: "2"
-    num-gpus: "1"
+    num-gpus: "0"
   resources:
     limits:
       cpu: "2"

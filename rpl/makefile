@@ -36,7 +36,7 @@ raycluster:
 	helm upgrade \
 		--install raycluster kuberay/ray-cluster \
 		--version $(kuberay_version) \
-		--values infra/kubernetes/ray/values.yaml \
+		--values rpl/infra/kubernetes/ray/values.yaml \
 		--wait --debug > /dev/null
 	make restart
 
