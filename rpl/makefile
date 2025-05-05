@@ -1,16 +1,16 @@
 .PHONY: raycluster
 
-include .env
+# include .env
 
 # Ray
-kuberay_version = $(KUBERAY_VERSION)
-cluster = $(CLUSTER_NAME)
+kuberay_version = 1.2.2
+cluster = kuberay
 service = raycluster-$(cluster)-head-svc
 
 # Jupyterhub
-jupyterhub_version = $(JUPYTERHUB_VERSION)
-project_path = $(PROJECT_PATH)
-head_ip = $(HEAD_IP)
+jupyterhub_version = 4.0.0
+project_path = /home/ray/k3s-ray-jupyterlab
+head_ip = 192.168.122.10
 
 ## install kubernetes network plugin
 network-plugin:
@@ -36,7 +36,7 @@ raycluster:
 	helm upgrade \
 		--install raycluster kuberay/ray-cluster \
 		--version $(kuberay_version) \
-		--values rpl/infra/kubernetes/ray/values.yaml \
+		--values infra/kubernetes/ray/values.yaml \
 		--wait --debug > /dev/null
 	make restart
 
@@ -48,7 +48,7 @@ jupyterhub-install:
 ## Create pvc
 jupyterhub-pvc:
 	kubectl create namespace jhub --dry-run=client -o yaml | kubectl apply -f -
-	kubectl apply -f $(project_path)/rpl/infra/kubernetes/jupyterlab/manifests/pvc.yaml
+	kubectl apply -f $(project_path)/infra/kubernetes/jupyterlab/manifests/pvc.yaml
 
 ## Create JupyterHub cluster
 jupyterhub-cluster:

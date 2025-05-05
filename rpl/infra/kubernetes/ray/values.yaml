@@ -11,6 +11,7 @@ head:
     # don't use head node for scheduling
     # as per https://github.com/ray-project/kuberay/blob/master/docs/best-practice/worker-head-reconnection.md#best-p>
     num-cpus: 0
+    num-gpus: 0
   resources:
     limits:
       cpu: "4"
