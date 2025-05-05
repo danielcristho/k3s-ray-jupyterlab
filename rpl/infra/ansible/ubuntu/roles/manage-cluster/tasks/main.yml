@@ -13,12 +13,12 @@
 - name: Install kubernetes library for Python using virtualenv
   command: /opt/ray-env/bin/pip install kubernetes
 
-- name: Clone ray project
-  changed_when: false
-  ansible.builtin.git:
-    repo: https://github.com/danielcristho/k3s-ray-jupyterlab.git
-    dest: /home/daniel/k3s-ray-jupyterlab
-    clone: true
+# - name: Clone ray project
+#   changed_when: false
+#   ansible.builtin.git:
+#     repo: https://github.com/danielcristho/k3s-ray-jupyterlab.git
+#     dest: /home/daniel/k3s-ray-jupyterlab
+#     clone: true
 
 - name: Config Git global safe directory
   ansible.builtin.command: git config --global --add safe.directory /home/daniel/ray-jupyterlab-k3
