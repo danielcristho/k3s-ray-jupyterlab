@@ -51,11 +51,32 @@
 #     dest: /etc/docker/daemon.json
 #     mode: preserve
 
+- name: Add NVIDIA GPG key
+  ansible.builtin.apt_key:
+    url: https://nvidia.github.io/nvidia-docker/gpgkey
+    state: present
+
+- name: Add NVIDIA Docker repository
+  ansible.builtin.get_url:
+    url: https://nvidia.github.io/nvidia-docker/ubuntu{{ ansible_lsb.release }}/nvidia-docker.list
+    dest: /etc/apt/sources.list.d/nvidia-docker.list
+    mode: '0644'
+
+- name: Update apt cache after adding NVIDIA repo
+  ansible.builtin.apt:
+    update_cache: yes
+
 - name: Install NVIDIA Container Toolkit
   ansible.builtin.apt:
     name:
       - nvidia-container-toolkit
     state: present
+
+- name: Configure Docker for GPU support
+  ansible.builtin.command:
+    cmd: nvidia-ctk runtime configure --runtime=docker
+  register: docker_support
+  ignore_errors: true
 
 - name: Restart Docker
   ansible.builtin.service:
@@ -65,7 +86,7 @@
 
 - name: Test GPU with Docker
   ansible.builtin.command:
-    cmd: docker run --rm --gpus all nvidia/cuda:12.2.0-base-ubuntu22.04 nvidia-smi
+    cmd: sudo docker run --rm --gpus all nvidia/cuda:11.4.3-cudnn8-runtime-ubuntu20.04 nvidia-smi
   register: gpu_test
   ignore_errors: true
 

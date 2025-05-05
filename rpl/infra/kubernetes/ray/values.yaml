@@ -13,26 +13,24 @@ head:
     num-cpus: 0
   resources:
     limits:
-      cpu: "2"
-      memory: "4G"
+      cpu: "4"
+      memory: "8Gi"
       nvidia.com/gpu: 1
     requests:
-      cpu: "2"
-      memory: "4G"
+      cpu: "4"
+      memory: "8Gi"
       nvidia.com/gpu: 1
 
 worker:
   minReplicas: 1
-  maxReplicas: 2
+  maxReplicas: 4
   rayStartParams:
     num-cpus: "2"
     num-gpus: "1"
   resources:
     limits:
       cpu: "2"
-      memory: "4G"
-      nvidia.com/gpu: 1
+      memory: "4Gi"
     requests:
       cpu: "2"
-      memory: "4G"
-      nvidia.com/gpu: 1
+      memory: "4Gi"

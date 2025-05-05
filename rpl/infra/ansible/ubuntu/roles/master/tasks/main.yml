@@ -22,11 +22,11 @@
     chown -R ray:ray /home/ray/.kube/config
     chmod 600 /home/ray/.kube/config
 
-- name: Replace 127.0.0.1 with 192.168.122.50 in kubeconfig
+- name: Replace 127.0.0.1 with 192.168.122.1 in kubeconfig
   ansible.builtin.replace:
     path: /home/ray/.kube/config
     regexp: 'https://127\.0\.0\.1:6443'
-    replace: "https://192.168.122.50:6443"
+    replace: "https://192.168.122.1:6443"
 
 - name: Fetch k3s token
   ansible.builtin.fetch:

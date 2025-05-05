@@ -1,31 +1,38 @@
 .PHONY: raycluster
 
+# Load environment variables from .env
+ifneq (,$(wildcard .env))
+	include .env
+	export
+endif
+
 # Ray
-kuberay_version = 1.2.2
-cluster = kuberay
+kuberay_version = $(KUBERAY_VERSION)
+cluster = $(CLUSTER_NAME)
 service = raycluster-$(cluster)-head-svc
 
 # Jupyterhub
-jupyterhub_version = 4.0.0
+jupyterhub_version = $(JUPYTERHUB_VERSION)
+home_path = $(HOME_PATH)
+head_ip = $(HEAD_IP)
 
 ## install kubernetes network plugin
 network-plugin:
-	kubectl apply -f /home/ray/k3s-ray-jupyterlab/infra/base/manifests/networks/calico.yaml
+	kubectl apply -f $(home_path)/infra/base/manifests/networks/calico.yaml
 
-## install nvidia kubernetes plugin
-nvidia-plugin:
-	helm repo add nvdp https://nvidia.github.io/k8s-device-plugin \
+## install nvidia kubernetes operator
+nvidia-operator:
+	helm repo add nvidia https://nvidia.github.io/gpu-operator \
 	&& helm repo update
-	helm install --generate-name nvdp/nvidia-device-plugin --namespace kube-system
+	helm install --wait --generate-name nvidia/gpu-operator --namespace kube-system
 	kubectl get pods -n kube-system|grep -i nvidia
 
 ## install kuberay operator using quickstart manifests
 kuberay:
-# add helm repo and update to latest
 	kubectl label node rpl-worker-2 node-role.kubernetes.io/worker=worker
-	kubectl label node rpl-worker-2  node-role.kubernetes.io/worker=worker
-	helm repo add kuberay https://ray-project.github.io/kuberay-helm/
-	helm repo update kuberay
+	kubectl label node rpl-worker-1 node-role.kubernetes.io/worker=worker
+	helm repo add kuberay https://ray-project.github.io/kuberay-helm \
+	&& helm repo update kuberay
 	helm upgrade --install kuberay-operator kuberay/kuberay-operator --version $(kuberay_version) --wait --debug > /dev/null
 
 ## create ray cluster
@@ -35,7 +42,6 @@ raycluster:
 		--version $(kuberay_version) \
 		--values rpl/infra/kubernetes/ray/values.yaml \
 		--wait --debug > /dev/null
-# restart needed because of https://github.com/ray-project/kuberay/issues/234
 	make restart
 
 ## restart the ray cluster
@@ -50,10 +56,6 @@ shell:
 ray-forward:
 	kubectl port-forward svc/$(service) 10001:10001 8265:8265 6379:6379 --address=0.0.0.0
 
-## status
-status: $(venv)
-	$(venv)/bin/ray status --address 192.168.122.10:6379 -v
-
 ## print ray commit
 version: $(venv)
 	$(venv)/bin/python -c 'import ray; print(f"{ray.__version__} {ray.__commit__}")'
@@ -62,13 +64,9 @@ version: $(venv)
 delete:
 	kubectl delete raycluster raycluster-$(cluster)
 
-## ping server endpoint
-ping: $(venv)
-	$(venv)/bin/python -m raydemo.ping
-
 ## head node logs
 logs-head:
-	kubectl logs -lray.io/cluster=raycluster-kuberay -lray.io/node-type=head -c ray-head -f
+	kubectl logs -lray.io/cluster=raycluster-$(cluster) -lray.io/node-type=head -c ray-head -f
 
 ## worker node logs
 logs-worker:
@@ -76,29 +74,11 @@ logs-worker:
 
 ## auto-scaler logs
 logs-as:
-	kubectl logs -lray.io/cluster=raycluster-kuberay -lray.io/node-type=head -c autoscaler -f
-
-## enable trafefik debug loglevel
-tdebug:
-	kubectl -n kube-system patch deployment traefik --type json -p '[{"op": "add", "path": "/spec/template/spec/containers/0/args/0", "value":"--log.level=DEBUG"}]'
-
-## tail traefik logs
-tlogs:
-	kubectl -n kube-system logs -l app.kubernetes.io/name=traefik -f
-
-## forward traefik dashboard
-tdashboard:
-	@echo Forwarding traefik dashboard to http://192.168.122.10:9000/dashboard/
-	tpod=$$(kubectl get pod -n kube-system -l app.kubernetes.io/name=traefik -o custom-columns=:metadata.name --no-headers=true) && \
-		kubectl -n kube-system port-forward $$tpod 9000:9000
-
-## run tf_mnist on cluster
-tf_mnist: $(venv)
-	$(venv)/bin/python -m raydemo.tf_mnist --address ray://192.168.122.10:10001
+	kubectl logs -lray.io/cluster=raycluster-$(cluster) -lray.io/node-type=head -c autoscaler -f
 
 ## list jobs
 job-list: $(venv)
-	$(venv)/bin/ray job list --address http://192.168.122.10:8265
+	$(venv)/bin/ray job list --address http://$(head_ip):8265
 
 ## JupyterHub initialize
 jupyterhub-install:
@@ -108,7 +88,7 @@ jupyterhub-install:
 ## Create pvc
 jupyterhub-pvc:
 	kubectl create namespace jhub --dry-run=client -o yaml | kubectl apply -f -
-	kubectl apply -f /home/ray/k3s-ray-jupyterlab/rpl/infra/kubernetes/jupyterlab/manifests/pvc.yaml
+	kubectl apply -f $(home_path)/rpl/infra/kubernetes/jupyterlab/manifests/pvc.yaml
 
 ## Create JupyterHub cluster
 jupyterhub-cluster:
@@ -116,7 +96,7 @@ jupyterhub-cluster:
 		--install jhub jupyterhub/jupyterhub \
 		--namespace jhub \
 		--version=$(jupyterhub_version) \
-		--values /home/ray/k3s-ray-jupyterlab/rpl/infra/kubernetes/jupyterlab/values.yaml \
+		--values $(home_path)/rpl/infra/kubernetes/jupyterlab/values.yaml \
 		--wait --debug
 
 ## Expose jupyterhub

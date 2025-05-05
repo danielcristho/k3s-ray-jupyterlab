@@ -1,5 +1,5 @@
 [rpl-master]
-192.168.122.50 ansible_user=ray
+127.0.0.1 ansible_user=daniel
 
 [rpl-worker-1]
 192.168.122.51 ansible_user=ray

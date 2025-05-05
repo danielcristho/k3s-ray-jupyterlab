@@ -2,7 +2,7 @@
 - name: Setup Master
   hosts: rpl-master
   become: true
-  remote_user: ray
+  remote_user: daniel
   roles:
     - config
     - docker
