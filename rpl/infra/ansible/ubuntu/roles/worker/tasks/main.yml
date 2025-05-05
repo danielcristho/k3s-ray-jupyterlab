@@ -11,8 +11,6 @@
     dest: /tmp/token
     mode: "0644"
 
-# Uncomment these section if you want manage the cluster from worker side
-
 # - name: Create kubeconfig directory
 #   ansible.builtin.file:
 #     path: /home/ray/.kube

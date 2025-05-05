@@ -17,17 +17,17 @@
   changed_when: false
   ansible.builtin.git:
     repo: https://github.com/danielcristho/k3s-ray-jupyterlab.git
-    dest: /home/ray/k3s-ray-jupyterlab
+    dest: /home/daniel/k3s-ray-jupyterlab
     clone: true
 
 - name: Config Git global safe directory
-  ansible.builtin.command: git config --global --add safe.directory /home/ray/ray-jupyterlab-k3
+  ansible.builtin.command: git config --global --add safe.directory /home/daniel/ray-jupyterlab-k3
   args:
-    creates: /home/ray/.gitconfig
+    creates: /home/daniel/.gitconfig
   become: true
 
 - name: Install calico network plugin
   kubernetes.core.k8s:
-    kubeconfig: /home/ray/.kube/config
-    src: /home/ray/k3s-ray-jupyterlab/infra/kubernetes/base/manifests/networks/calico.yaml
+    kubeconfig: /home/daniel/.kube/config
+    src: /home/daniel/k3s-ray-jupyterlab/rpl/infra/kubernetes/base/manifests/networks/calico.yaml
     state: present

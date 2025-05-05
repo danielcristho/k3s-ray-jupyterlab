@@ -17,14 +17,14 @@
 
 - name: Configure kubeconfig
   ansible.builtin.shell: |
-    mkdir -p /home/ray/.kube
-    cp /etc/rancher/k3s/k3s.yaml /home/ray/.kube/config
-    chown -R ray:ray /home/ray/.kube/config
-    chmod 600 /home/ray/.kube/config
+    mkdir -p /home/daniel/.kube
+    cp /etc/rancher/k3s/k3s.yaml /home/daniel/.kube/config
+    chown -R daniel:daniel /home/daniel/.kube/config
+    chmod 600 /home/daniel/.kube/config
 
 - name: Replace 127.0.0.1 with 192.168.122.1 in kubeconfig
   ansible.builtin.replace:
-    path: /home/ray/.kube/config
+    path: /home/daniel/.kube/config
     regexp: 'https://127\.0\.0\.1:6443'
     replace: "https://192.168.122.1:6443"
 
@@ -36,6 +36,6 @@
 
 - name: Fetch kubeconfig
   ansible.builtin.fetch:
-    src: /home/ray/.kube/config
+    src: /home/daniel/.kube/config
     dest: ./kubeconfig
     flat: yes
