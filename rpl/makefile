@@ -13,12 +13,12 @@ service = raycluster-$(cluster)-head-svc
 
 # Jupyterhub
 jupyterhub_version = $(JUPYTERHUB_VERSION)
-home_path = $(HOME_PATH)
+project_path = $(PROJECT_PATH)
 head_ip = $(HEAD_IP)
 
 ## install kubernetes network plugin
 network-plugin:
-	kubectl apply -f $(home_path)/infra/base/manifests/networks/calico.yaml
+	kubectl apply -f $(project_path)/infra/base/manifests/networks/calico.yaml
 
 ## install nvidia kubernetes operator
 nvidia-operator:
@@ -40,9 +40,32 @@ raycluster:
 	helm upgrade \
 		--install raycluster kuberay/ray-cluster \
 		--version $(kuberay_version) \
-		--values rpl/infra/kubernetes/ray/values.yaml \
+		--values infra/kubernetes/ray/values.yaml \
 		--wait --debug > /dev/null
 	make restart
+
+## JupyterHub initialize
+jupyterhub-install:
+	helm repo add jupyterhub https://hub.jupyter.org/helm-chart
+	helm repo update
+
+## Create pvc
+jupyterhub-pvc:
+	kubectl create namespace jhub --dry-run=client -o yaml | kubectl apply -f -
+	kubectl apply -f $(project_path)/rpl/infra/kubernetes/jupyterlab/manifests/pvc.yaml
+
+## Create JupyterHub cluster
+jupyterhub-cluster:
+	helm upgrade --cleanup-on-fail \
+		--install jhub jupyterhub/jupyterhub \
+		--namespace jhub \
+		--version=$(jupyterhub_version) \
+		--values $(project_path)/rpl/infra/kubernetes/jupyterlab/values.yaml \
+		--wait --debug
+
+## Expose jupyterhub
+jupyterhub-forward:
+	kubectl --namespace=jhub port-forward service/proxy-public 8080:http --address 0.0.0.0
 
 ## restart the ray cluster
 restart:
@@ -79,26 +102,3 @@ logs-as:
 ## list jobs
 job-list: $(venv)
 	$(venv)/bin/ray job list --address http://$(head_ip):8265
-
-## JupyterHub initialize
-jupyterhub-install:
-	helm repo add jupyterhub https://hub.jupyter.org/helm-chart
-	helm repo update
-
-## Create pvc
-jupyterhub-pvc:
-	kubectl create namespace jhub --dry-run=client -o yaml | kubectl apply -f -
-	kubectl apply -f $(home_path)/rpl/infra/kubernetes/jupyterlab/manifests/pvc.yaml
-
-## Create JupyterHub cluster
-jupyterhub-cluster:
-	helm upgrade --cleanup-on-fail \
-		--install jhub jupyterhub/jupyterhub \
-		--namespace jhub \
-		--version=$(jupyterhub_version) \
-		--values $(home_path)/rpl/infra/kubernetes/jupyterlab/values.yaml \
-		--wait --debug
-
-## Expose jupyterhub
-jupyterhub-forward:
-	kubectl --namespace=jhub port-forward service/proxy-public 8080:http --address 0.0.0.0
