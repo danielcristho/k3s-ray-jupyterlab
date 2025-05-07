@@ -4,17 +4,17 @@
   become: true
   remote_user: daniel
   roles:
-    - config
-    - docker
+    # - config
+    # - docker
     - master
-    - manage-cluster
+    # - manage-cluster
 
-- name: Setup Worker
-  hosts:
-    - rpl-worker-1
-    - rpl-worker-2
-  become: true
-  remote_user: ray
-  roles:
-    - config
-    - worker
+# - name: Setup Worker
+#   hosts:
+#     - rpl-worker-1
+#     - rpl-worker-2
+#   become: true
+#   remote_user: ray
+#   roles:
+#     - config
+#     - worker
