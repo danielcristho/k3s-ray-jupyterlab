@@ -28,14 +28,14 @@
     regexp: 'https://127\.0\.0\.1:6443'
     replace: "https://192.168.122.1:6443"
 
-- name: Fetch k3s token
-  ansible.builtin.fetch:
-    src: /var/lib/rancher/k3s/server/node-token
-    dest: ./token
-    flat: yes
+# - name: Fetch k3s token
+#   ansible.builtin.fetch:
+#     src: /var/lib/rancher/k3s/server/node-token
+#     dest: ./token
+#     flat: yes
 
-- name: Fetch kubeconfig
-  ansible.builtin.fetch:
-    src: /home/daniel/.kube/config
-    dest: ./kubeconfig
-    flat: yes
+# - name: Fetch kubeconfig
+#   ansible.builtin.fetch:
+#     src: /home/daniel/.kube/config
+#     dest: ./kubeconfig
+#     flat: yes
