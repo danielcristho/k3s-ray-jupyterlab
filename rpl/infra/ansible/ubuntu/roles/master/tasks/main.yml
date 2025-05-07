@@ -11,9 +11,10 @@
     chmod +x kubectl
     sudo mv kubectl /usr/local/bin
 
-- name: Install k3s
+- name: Install k3s with custom TLS SAN
   ansible.builtin.shell: |
-    curl -sfL https://get.k3s.io | K3S_KUBECONFIG_MODE="644" INSTALL_K3S_EXEC="server --flannel-backend=vxlan --disable-network-policy" sh -
+    curl -sfL https://get.k3s.io | K3S_KUBECONFIG_MODE="644" \
+    INSTALL_K3S_EXEC="server --flannel-backend=vxlan --disable-network-policy --tls-san 192.168.122.1" sh -
 
 - name: Configure kubeconfig
   ansible.builtin.shell: |
