@@ -1,10 +1,9 @@
 version: 2
-dependabot:
-  updates:
+updates:
   - package-ecosystem: "pip"
     directory: "/infra/docker/jupyterlab"
     schedule:
-      interval: "weekly"
+      interval: "daily"
     commit-message:
       prefix: "deps"
     allow:
@@ -13,7 +12,7 @@ dependabot:
   - package-ecosystem: "pip"
     directory: "/infra/docker/ray"
     schedule:
-      interval: "weekly"
+      interval: "daily"
     commit-message:
       prefix: "deps"
     allow:
@@ -22,7 +21,7 @@ dependabot:
   - package-ecosystem: "pip"
     directory: "/ray-projects"
     schedule:
-      interval: "weekly"
+      interval: "daily"
     commit-message:
       prefix: "deps"
     allow:
