@@ -9,8 +9,8 @@ service = raycluster-$(cluster)-head-svc
 jupyterhub_version = 4.0.0
 
 ## install kubernetes network plugin
-network-plugin:
-	kubectl apply -f /home/ray/k3s-ray-jupyterlab/infra/base/manifests/networks/calico.yaml
+# network-plugin:
+# 	kubectl apply -f /home/ray/k3s-ray-jupyterlab/infra/base/manifests/networks/calico.yaml
 
 ## install nvidia kubernetes plugin
 nvidia-plugin:
@@ -108,7 +108,7 @@ jupyterhub-install:
 ## Create pvc
 jupyterhub-pvc:
 	kubectl create namespace jhub --dry-run=client -o yaml | kubectl apply -f -
-	kubectl apply -f /home/ray/k3s-ray-jupyterlab/infra/kubernetes/jupyterlab/manifests/pvc.yaml
+	kubectl apply -f /home/daniel/k3s-ray-jupyterlab/infra/kubernetes/jupyterlab/manifests/pvc.yaml
 
 ## Create JupyterHub cluster
 jupyterhub-cluster:
@@ -116,9 +116,9 @@ jupyterhub-cluster:
 		--install jhub jupyterhub/jupyterhub \
 		--namespace jhub \
 		--version=$(jupyterhub_version) \
-		--values /home/ray/k3s-ray-jupyterlab/infra/kubernetes/jupyterlab/values.yaml \
+		--values /home/daniel/k3s-ray-jupyterlab/infra/kubernetes/jupyterlab/values.yaml \
 		--wait --debug
 
 ## Expose jupyterhub
 jupyterhub-forward:
-	kubectl --namespace=jhub port-forward service/proxy-public 8081:http --address 0.0.0.0
+	kubectl --namespace=jhub port-forward service/proxy-public 8081:80 --address 0.0.0.0

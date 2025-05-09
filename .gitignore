@@ -54,3 +54,6 @@ venv/
 # Personal Lab
 netics
 # rpl
+
+# Environment file
+.env

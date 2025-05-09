@@ -5,6 +5,7 @@
 - [x] JupyterHub integrated and accessible to users
 - [x] JupyterLab with RAY auto-connect
 - [x] Ray tasks distributed and tracked across nodes
+- [X] Change container runtime from containerd to docker
 
 ## To-do
 

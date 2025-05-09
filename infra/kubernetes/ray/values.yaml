@@ -2,7 +2,7 @@
 # and https://docs.ray.io/en/latest/cluster/kubernetes/user-guides/config.html
 image:
   repository: danielcristh0/ray
-  tag: 1.1
+  tag: rpl
   pullPolicy: Always
 
 head:
@@ -11,21 +11,27 @@ head:
     # don't use head node for scheduling
     # as per https://github.com/ray-project/kuberay/blob/master/docs/best-practice/worker-head-reconnection.md#best-p>
     num-cpus: 0
+    num-gpus: 0
   resources:
     limits:
-      cpu: "2"
-      memory: "2G"
+      cpu: "4"
+      memory: "8Gi"
+      nvidia.com/gpu: 1
     requests:
-      cpu: "2"
-      memory: "2G"
+      cpu: "4"
+      memory: "8Gi"
+      nvidia.com/gpu: 1
 
 worker:
   minReplicas: 1
-  maxReplicas: 2
+  maxReplicas: 3
+  rayStartParams:
+    num-cpus: "2"
+    num-gpus: "0"
   resources:
     limits:
-      cpu: "1"
-      memory: "1G"
+      cpu: "2"
+      memory: "4Gi"
     requests:
-      cpu: "1"
-      memory: "1G"
+      cpu: "2"
+      memory: "4Gi"
