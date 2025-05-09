@@ -1,4 +1,4 @@
-name: Dependabot PRs Merge
+name: Dependabot auto merging
 
 on:
   pull_request:
@@ -6,6 +6,7 @@ on:
       - opened
       - reopened
       - synchronize
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -19,10 +20,10 @@ jobs:
       - name: Auto-approve
         uses: hmarr/auto-approve-action@v3
         with:
-          github-token: "${{ secrets.GITHUB_TOKEN }}"
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Enable auto-merge
-        uses: "peter-evans/enable-pull-request-automerge@v3"
+        uses: peter-evans/enable-pull-request-automerge@v3
         with:
-          token: "${{ secrets.GITHUB_TOKEN }}"
+          token: ${{ secrets.GITHUB_TOKEN }}
           merge-method: squash
