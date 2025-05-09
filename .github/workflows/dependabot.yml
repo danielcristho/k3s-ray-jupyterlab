@@ -1,0 +1,29 @@
+version: 2
+dependabot:
+  updates:
+  - package-ecosystem: "pip"
+    directory: "/infra/docker/jupyterlab"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "deps"
+    allow:
+      - dependency-type: "all"
+
+  - package-ecosystem: "pip"
+    directory: "/infra/docker/ray"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "deps"
+    allow:
+      - dependency-type: "all"
+
+  - package-ecosystem: "pip"
+    directory: "/ray-projects"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "deps"
+    allow:
+      - dependency-type: "all"
