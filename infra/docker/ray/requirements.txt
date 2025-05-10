@@ -188,7 +188,7 @@ backoff==1.10.0
     #   -r python/requirements/test-requirements.txt
     #   opentelemetry-exporter-otlp-proto-grpc
     #   segment-analytics-python
-base58==2.0.1
+base58==2.1.1
     # via aimrecords
 bash-kernel==0.10.0
     # via -r python/requirements/test-requirements.txt
