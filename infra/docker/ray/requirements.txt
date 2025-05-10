@@ -1776,7 +1776,7 @@ pytorch-lightning==1.8.6
     # via -r python/requirements/ml/tune-test-requirements.txt
 pytorch-ranger==0.1.1
     # via torch-optimizer
-pytz==2022.7.1
+pytz==2025.2
     # via
     #   -r python/requirements/test-requirements.txt
     #   aim
