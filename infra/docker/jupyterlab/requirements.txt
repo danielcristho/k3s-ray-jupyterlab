@@ -162,7 +162,7 @@ nbclassic==1.2.0
     # via -r unfrozen/requirements.txt
 nbclient==0.10.2
     # via nbconvert
-nbconvert==7.16.5
+nbconvert==7.16.6
     # via jupyter-server
 nbformat==5.10.4
     # via
