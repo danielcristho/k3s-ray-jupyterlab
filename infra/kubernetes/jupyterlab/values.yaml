@@ -7,30 +7,39 @@ hub:
       shutdown_on_logout: true
       bind_url: http://:8081
       # cookie_domain: "localhost"
+
     KubeSpawner:
       k8s_api_request_timeout: 60
       start_timeout: 300
       http_timeout: 300
+
     Authenticator:
       admin_users:
         - admin
+
     ConfigurableHTTPProxy:
       api_url: http://proxy-api:8001
+
   extraEnv:
     CONFIGPROXY_AUTH_TOKEN: "c413fe27d65c5916b7cf4028bf49a19b3056d59f2c2d1e79349244a6f758babe"
     JUPYTERHUB_PROXY_API_URL: http://proxy-api:8001
     JUPYTERHUB_LOG_LEVEL: DEBUG
+
   nodeSelector:
     kubernetes.io/hostname: rpl
+
   db:
     url: sqlite:////data/jupyterhub.sqlite
+
   extraVolumes:
     - name: jupyterhub-db
       persistentVolumeClaim:
         claimName: jupyterhub-pvc
+
   extraVolumeMounts:
     - name: jupyterhub-db
       mountPath: /data
+
   resources:
     requests:
       memory: "3G"
@@ -38,6 +47,7 @@ hub:
     limits:
       memory: "4G"
       cpu: "2"
+
   livenessProbe:
     httpGet:
       path: /hub/health
@@ -46,6 +56,7 @@ hub:
     periodSeconds: 20
     timeoutSeconds: 5
     failureThreshold: 10
+
   readinessProbe:
     httpGet:
       path: /hub/health
@@ -54,8 +65,30 @@ hub:
     periodSeconds: 10
     timeoutSeconds: 5
     failureThreshold: 6
+
   networkPolicy:
     enabled: false
+
+    extraConfig:
+    01-choose-node-hook: |
+      from kubespawner import KubeSpawner
+      import requests
+      import random
+
+      async def pre_spawn_hook(spawner: KubeSpawner):
+          try:
+              resp = requests.get("http://127.0.0.1:5000/available-nodes", timeout=2)
+              nodes = resp.json()
+              sorted_nodes = sorted(nodes, key=lambda x: (x.get("has_gpu", False), -x.get("cpu_usage_percent", 100)))
+              chosen = sorted_nodes[0]  # Pilih node dengan GPU (jika ada) dan CPU usage rendah
+
+              spawner.log.info(f"Spawning user on node {chosen['hostname']} (GPU: {chosen['has_gpu']}, CPU Usage: {chosen['cpu_usage_percent']})")
+
+              spawner.extra_resource_limits = {"nvidia.com/gpu": "1"} if chosen["has_gpu"] else {}
+              spawner.node_selector = {"kubernetes.io/hostname": chosen["hostname"]}
+
+          except Exception as e:
+              spawner.log.warn(f"[ServiceDiscovery] Gagal memilih node: {e}")
 
 proxy:
   secretToken: "c413fe27d65c5916b7cf4028bf49a19b3056d59f2c2d1e79349244a6f758babe"
@@ -69,7 +102,6 @@ proxy:
       - --api-port=8001
     extraEnv:
       CONFIGPROXY_API_PORT: "8001"
-    # extraPodSpec: {}
     nodeSelector:
       kubernetes.io/hostname: rpl
     resources:
@@ -89,39 +121,27 @@ scheduling:
 singleuser:
   defaultUrl: "/lab"
   storage:
-    capacity: 1Gi
+    capacity: 5Gi
     dynamic:
-      pvcNameTemplate: claim-{username}
+      pvcNameTemplate: local-path
       storageAccessModes: ["ReadWriteOnce"]
+      homeMountPath: /home/jovyan
   memory:
     guarantee: 512M
     limit: 1G
   cpu:
     guarantee: 0.5
     limit: 1
+
   profileList:
     - display_name: "CPU Server"
-      description: "Node worker biasa"
+      description: "Jalankan di node yang memiliki CPU saja"
       kubespawner_override:
         image: danielcristh0/jupyterlab:1.1
-        cpu_limit: 2
-        mem_limit: 4G
-        cpu_guarantee: 2
-        mem_guarantee: 4G
-        node_selector:
-          kubernetes.io/hostname: rpl
     - display_name: "GPU Server"
-      description: "Jalankan di node head dengan GPU"
+      description: "Jalankan di node yang memiliki GPU"
       kubespawner_override:
         image: danielcristh0/jupyterlab:rpl
-        cpu_limit: 4
-        mem_limit: 8G
-        cpu_guarantee: 2
-        mem_guarantee: 4G
-        extra_resource_limits:
-          nvidia.com/gpu: "1" # TIME-SLICING: Use a slice of GPU using time-slicing mode
-        node_selector:
-          kubernetes.io/hostname: rpl
 
 prePuller:
   hook:
