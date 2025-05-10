@@ -10,7 +10,7 @@ def all_nodes():
 
 @app.route("/health-check")
 def health_check():
-    return jsonify({"status": "ok", "message": "Hello From RAY API Discovery!"}), 200
+    return jsonify({"status": "ok", "message": "Hello, from RAY API Discovery!"}), 200
 
 
 @app.route("/available-nodes")
