@@ -219,7 +219,7 @@ pycparser==2.22
     # via cffi
 pydantic==2.10.5
     # via jupyterhub
-pydantic-core==2.27.2
+pydantic-core==2.34.1
     # via pydantic
 pygments==2.19.1
     # via
