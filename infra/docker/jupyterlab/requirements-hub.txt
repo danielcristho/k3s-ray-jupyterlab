@@ -139,7 +139,7 @@ jupyter-server-terminals==0.5.3
 jupyterhub==5.2.1
     # via -r unfrozen/requirements.txt\
 # jupyterhub-singleuser==5.2.1
-jupyterlab==4.3.4
+jupyterlab==4.4.2
     # via -r unfrozen/requirements.txt
 jupyterlab-pygments==0.3.0
     # via nbconvert
